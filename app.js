@@ -10,6 +10,8 @@ app.listen(8000, ()=>{//8000번 포트로 누군가 접속하면 함수를 실�
 	console.log("http://localhost:8000")
 });
 
+
+//Router(길잡이)
 app.use("/",express.static("./public"));
 //public
 
@@ -18,7 +20,7 @@ app.get("/hello", (req,res) => {//주소줄로 hello접근하면 "Hello World"�
 var id = req.query.userid; //?의 유저 아이디라는 요청이 들어오면
 //http:127.0.0.1:8000/hello(get방식요청)(인자)?userid=doori/var id=doori라는 유저아이디를 받음.
 var style = `style="text-align:center; color:tomato; padding:3rem;"`;
-var html = `<h1 ${style}>${id} 님 반갑습니다.</h1>`;
+var html = `<h1 ${style}>${id} 님 반갑습니다~~~~</h1>`;
 	res.send(html);
 });
 //프로그램을 돌릴 때 앞전작업이 적용되어있음.
