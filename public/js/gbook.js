@@ -9,4 +9,4 @@ function onSend(f){
 	return true;
 }
 // 입력이 없으면  alret창이 뜨고 멈추고
-// 입력이 되면 true값을 받아서 전송
+// 입력이 되면 true값을 받아서 전송  (js방식으로 브라우저에서)

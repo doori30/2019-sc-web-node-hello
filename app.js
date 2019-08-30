@@ -5,6 +5,7 @@ const express = require('express'); //'express.js'
 //△ function(){}->express ->require에 넣어 변수를 만듦.
 //▽ 리턴값이 있어서 express로 받을 수 있다. express실행함.
 const app = express();
+const bodyParser = require("body-parser");
 //▽ listen() : express 의 메서드(method) 이며, 서버를 구동시킨다.
 app.listen(8000, ()=>{//8000번 포트로 누군가 접속하면 함수를 실행해라.
 	console.log("http://localhost:8000")
@@ -12,6 +13,7 @@ app.listen(8000, ()=>{//8000번 포트로 누군가 접속하면 함수를 실�
 
 
 //Router(길잡이)
+app.use(bodyParser.urlencoded({extended: false})); //바디해석을 url의 encoding 객체를 파싱할지 말지.
 app.use("/",express.static("./public"));
 //public
 
@@ -25,3 +27,11 @@ var html = `<h1 ${style}>${id} 님 반갑습니다~~~~</h1>`;
 });
 //프로그램을 돌릴 때 앞전작업이 적용되어있음.
 //바뀐걸로 돌릴려면 앞전 작업의 서버구동을 멈추고 (ctrl+c) 다시 새로 구동해야함.(node app)
+
+
+//const bodyParser = require("body-parser");
+//app.use(bodyParser.urlencoded({extended: false})); //바디해석을 url의 encoding 객체를 파싱할지 말지.
+app.post("/gbook_save",(req,res)=>{
+	var comment = req.body.comment;
+	res.send(comment);
+});
