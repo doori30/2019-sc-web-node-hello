@@ -6,10 +6,19 @@ const express = require('express'); //'express.js'
 //▽ 리턴값이 있어서 express로 받을 수 있다. express실행함.
 const app = express();
 const bodyParser = require("body-parser");
+//const nameMaker = require('./modules/test');
+const db = require("./modules/mysql_conn");
+const util = require("./modules/util");
+
 //▽ listen() : express 의 메서드(method) 이며, 서버를 구동시킨다.
 app.listen(8000, ()=>{//8000번 포트로 누군가 접속하면 함수를 실행해라.
-	console.log("http://localhost:8000")
+	console.log("http://localhost:8000");
+	// console.log(nameMaker.firstName);
+	// console.log(nameMaker.lastName);
+	// console.log(nameMaker.fullName());
 });
+
+
 
 
 //Router(길잡이)
@@ -33,5 +42,33 @@ var html = `<h1 ${style}>${id} 님 반갑습니다~~~~</h1>`;
 //app.use(bodyParser.urlencoded({extended: false})); //바디해석을 url의 encoding 객체를 파싱할지 말지.
 app.post("/gbook_save",(req,res)=>{
 	var comment = req.body.comment;
-	res.send(comment);
+	//연결이 되면 △ 실행
+	db.conn.getConnection((err, connect)=>{
+		if(err) {
+			res.send("DB접속 오류가 발생했습니다.");
+		}
+		else{
+			var sql = 'INSERT INTO gbook SET comment=?, wtime=?';
+			console.log(util.dspDate(new Date()));
+			var vals = [comment, util.dspDate(new Date())]; //comment=? , wtime=? 첫번째 값, 두번째값, 서버의값
+			connect.query(sql, vals, (err,result) =>{
+				connect.release();
+				//에러가 뜨면 if, 아니라면 else
+				if(err) {
+					res.send("데이터 저장에 실패했습니다.");
+			}
+				else {
+					console.log(result);
+					res.send("데이터가 처리되었습니다");
+				}
+			});
+		}
+	});
+});
+
+//시멘틱방식 (시맨틱 웹)
+//app.get("/gbook/:type:page",(req,res) =>{});
+app.get("/gbook/:page",(req,res) =>{
+	var page = req.params.page;
+	res.send("현재 페이지는 "+page+" 입니다.")
 });
