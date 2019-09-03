@@ -27,21 +27,29 @@
 function err(err){
 	console.log(err);
  }
+ 
+ //Ajax 함수
+ async function getAjax(url){
+	 return await $.ajax({url});
+	 //비동기를 동기화 시킴.async await
+	}
+	getAjax("../json/sample.json").then(getUser).catch(err);
+	getAjax("../json/score.json").then(getScore).catch(err);
 
-//Ajax 함수
-async function getAjax(url){
-	return await $.ajax({url});
-	//비동기를 동기화 시킴.async await
-}
-getAjax("../json/sample.json").then(getUser).catch(err);
-getAjax("../json/score.json").then(getScore).catch(err);
-
-function getUser(data){
+	function getUser(data){
 	console.log(data);
 }
 function getScore(data){
 	console.log(data);
 }
+
+//예제
+var user;
+$.ajax({
+	name:"홍길동",
+	age:25
+})
+
 
 // new Promise(function(resolve, reject){
 // 		$.ajax({

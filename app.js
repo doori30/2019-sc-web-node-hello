@@ -24,10 +24,11 @@ var html = `<h1 ${style}>${id} 님 반갑습니다~~~~</h1>`;
 
 app.post("/gbook_save", (req, res) => {
 	const comment = req.body.comment;
-	const sql = "INSERT INTO gbook SET comment=?, wtime=?";
+	const sql = "INSERT INTO gbook SET comment=?, wtime=?"; 
+	//? 안에 들어갈 내용을 const data = await connect.query(sql, vals); 에서 받아서 실행해줌.
 	const vals = [comment, util.dspDate(new Date())];
-	sqlExec(sql, vals).then((data) => {
-		console.log(data);
+	sqlExec(sql, vals).then((data) => {//promise를 리턴 불러오는 개체.구체적으로 편하게 찾기위해 사용하는 함수가 then
+		console.log(data);               //콜백을 simple하게 만들어줌. mysql에 대한 결과값을 보여줌.
 		res.send(data);
 	}).catch(sqlErr);
 });

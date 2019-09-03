@@ -17,12 +17,23 @@ const sqlErr =  err => {
 }
 
 const sqlExec = async(sql, vals) => {
-	const connect = await sqlPool.getConnection(async conn => conn); //await 동기화
-	const data = await connect.query(sql, vals); 
+	const connect = await sqlPool.getConnection(async conn => conn); //이유없는 명령어를 설정해줌. 아무역활이 없음.
+	//promise개체    -> 콜백을 감싸는 함수일 때, 
+	//resolve를 프로미스로 받음.
+	//await 동기화 promis 개체가 됨.(무조건 async 안에서만 사용가능)
+	const data = await connect.query(sql, vals); //데이터도 프로미스개체임.
 	// 결과를 주기전에 55라인에서 홀딩
 	connect.release();
 	return data;
 }
+
+/* async function sqlExec(sql,vals){
+getConnection(async function(connect)); 또 콜백을 줘야하기 때문에 상단으로 변경됨.
+} 
+async와 await는 promise 개체이기 때문에 이 두가지 명령어가 들어가면 promise안에서 돌아간다.
+그래서 결과값은 보기 위해서 .then()을 사용함.
+콜백에서 받을 데이터를 사용함. 
+*/
 
 module.exports = {
 	mysql,
