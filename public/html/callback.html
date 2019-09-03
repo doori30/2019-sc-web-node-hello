@@ -1,0 +1,62 @@
+<script src="../js/jquery-3.4.1.min.js"></script>
+<script>
+console.log("Hello");
+//setTimeout- 콜백 비동기 함수
+setTimeout(function(){
+	console.log("World");	
+},0);
+console.log("See you");
+
+// function getUser(){
+// 	var result;
+// 	$.ajax({
+// 		url:"../json/sample.json",
+// 		success: function(data){
+// 			result = data;
+// 			//return data;-> success(비동기)로 리턴이 되므로 의미가 없다.
+// 		}//콜백의 약점. (실행순서가 다 다름.)
+// 	});
+// 	return result; 콘솔에 찍히기 전에 이미 리턴을 해버리기 때문에 결과 값이 undifind로 뜬다.
+// }
+// console.log(getUser());// 
+
+function getUser(cb){
+	var result;
+	$.ajax({
+		url:"../json/sample.json",
+		success: cb
+		});
+}
+//getUser(function(data){	console.log(data);})
+function userCb(data){
+	console.log(data);}
+	getUser(userCb);
+
+//콜백을 함수로 나눠 관리하기 편하게 함.
+//함수선언문이 어디있어도 바로 결과를 받을 수 있다.
+// function(data){
+// 			console.log(data);
+// 		}->콜백함수를 받아서 getUser에 데이터가 찍히게 하기. 
+
+function aaa(str, cb){
+	str = str + "Hello";  //AB
+	cb(str);
+}
+
+function bbb(str, cb){
+	str = str + "World";   //ABC
+	cb(str);
+}
+
+function getTest(name){
+	aaa(name, function(data){//인자, 콜백
+		bbb(data, function(data2){//b에 데이터2에 콜백
+			console.log(data2)
+		})
+	});
+}
+//콜백의 구현.
+getTest("doori");
+
+
+</script>

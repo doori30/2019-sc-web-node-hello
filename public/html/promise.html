@@ -1,0 +1,61 @@
+<script src="../js/jquery-3.4.1.min.js"></script>
+<script>
+	//CallBack 구현
+// function getUser(cb){
+// 	$.ajax({
+// 		url: "../json/sample.json",
+// 		success: cb
+// 	});
+// }
+
+// getUser(function(data){
+// 	console.log(data);
+// });
+
+// function getUser(cb){
+// 	//리턴해서 promis를 받아서 getUser에 전달됨.
+// 	return new Promise(function(resolve, reject){
+// 		//promise구문.
+// 		$.ajax({
+// 		url: "../json/sample.json",
+// 		success: function(data){
+// 			resolve(data);
+// 		}, //성공했을 시 Promis의 인자 resolve(결단)에 data를 받아서 전달.
+// 		error: function(xhr){
+// 			reject(xhr);
+// 		}
+// 	});
+// 	});
+// }
+// getUser().then(function(data){
+// 	console.log(data);
+// }).catch(function(err){
+// 	console.log(err)
+// });
+function getUser(url){
+	return new Promise(function(resolve, reject){
+		$.ajax({
+		url,
+		success: function(data){
+			resolve(data);
+		},
+		error: function(xhr){
+			reject(xhr);
+		}
+	});
+	});
+}
+function errCatch(err){
+	console.log(err);
+}
+function resultUser(data){
+	console.log(data);
+}
+getUser("../json/sample.json").then(resultUser).catch(errCatch);
+//getUser은 resolve, reject를 받아서 성공하면 then 실패하면 catch 
+//promise의 장점은 다중 콜백을 사용할 시 편하다
+//ES6문법
+
+
+
+</script>
