@@ -1,0 +1,64 @@
+<script src="../js/jquery-3.4.1.min.js"></script>
+<script>
+//  async function getUser(url){
+// //비동기 함수로 선언해줌. async function
+// 	var result = await $.ajax({url});
+// 	//         콜백함수 앞에 매소드를 붙임. -결과값이 나올때 까지 기다리다가 결과값이 나오면 promise로 받음.
+// 	return result;
+// }
+// //결과값이 promise 전체가 옴.
+// console.log(getUser("../json/sample.json"));
+
+
+//  async function getUser(url){
+// //비동기 함수로 선언해줌. async function
+// 	var result = await $.ajax({url});
+// 	//         콜백함수 앞에 매소드를 붙임. -결과값이 나올때 까지 기다리다가 결과값이 나오면 promise로 받음.
+// 	return result;
+// }
+// //결과값이 promise 전체가 옴.
+// getUser("../json/sample.json").then(function(data){
+// 	console.log(data);
+// }).catch(function(err){
+// 	console.log(err);
+// });
+
+// 공통함수
+function err(err){
+	console.log(err);
+ }
+
+//Ajax 함수
+async function getAjax(url){
+	return await $.ajax({url});
+	//비동기를 동기화 시킴.async await
+}
+getAjax("../json/sample.json").then(getUser).catch(err);
+getAjax("../json/score.json").then(getScore).catch(err);
+
+function getUser(data){
+	console.log(data);
+}
+function getScore(data){
+	console.log(data);
+}
+
+// new Promise(function(resolve, reject){
+// 		$.ajax({
+// 		url,
+// 		success: function(data){
+// 			resolve(data);
+// 		},
+// 		error: function(xhr){
+// 			reject(xhr);
+// 		}
+// 	});
+// 	});
+//▼
+// return await $.ajax({url});
+// 	//비동기를 동기화 시킴.async await
+// }
+// getAjax("../json/sample.json").then(getUser).catch(err);
+// getAjax("../json/score.json").then(getScore).catch(err);
+
+</script>
