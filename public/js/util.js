@@ -1,7 +1,7 @@
 //'2019년 8월 11일 11시 11분 11초' 형식으로 보내주는 함수
 //function dspDate(d, type = 0)->ES6부터 가능하다.
 function dspDate(d, type) {
-	var type = typeof type !== 'undefined' ? type : 0;
+	var type = typeof type !== 'undefined' ? type : "0";
 	//type변수 =type의 형태를 찾는 typeof == '빈값' 같지 않으면 false =0 type값이 있으면 변수에 넣음.
 	// 기본 (parameter)값을 지정해 줄 수 있다.
 	var monthArr = ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월", ];

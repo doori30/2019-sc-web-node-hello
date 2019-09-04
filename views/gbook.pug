@@ -1,0 +1,34 @@
+doctype html
+html(lang="ko")
+	head
+		include ./inc/header.pug
+	body
+		include ./inc/navi.pug
+		.container.my-3
+			.jumbotron
+				h2= `${title}`
+			table.table.table-bordered.table-hover.my-3.text-center
+				colgroup
+					col(width="8%")
+					col
+					col(width="20%")
+					col(width="15%")
+				thead.thead-dark
+					tr
+						th 번호
+						th 한마디	
+						th 작성일
+						th 비고
+				tbody
+					each item in datas
+						tr
+							td= item.id
+							td.text-left= item.comment
+							td= item.wtime
+							td
+								button.btn.btn-info.btn-sm.mr-1 수정
+								button.btn.btn-danger.btn-sm 삭제
+
+		include ./inc/footer.pug
+		include ./inc/script.pug
+		//-each item in datas->pug가 가지고 있는 반복문 데이터스안에 리스트가 있음.thead-dark
