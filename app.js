@@ -14,6 +14,8 @@ app.listen(8000, ()=>{//8000번 포트로 누군가 접속하면 함수를 실�
 //Router(길잡이)
 app.use(bodyParser.urlencoded({extended: true})); //바디해석을 url의 encoding 객체를 파싱할지 말지.
 app.use("/",express.static("./public"));
+app.set("view engine","pug");//app이 가지는 속성값
+app.set("views","./views")//view들이 저장되는 곳은.views라는 폴더임.
 
 app.get("/hello", (req,res) => {
 var id = req.query.userid; //http:127.0.0.1:8000/hello(get방식요청)(인자)?userid=doori/var id=doori라는 유저아이디를 받음.
