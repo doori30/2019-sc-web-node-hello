@@ -32,7 +32,7 @@ app.get(["/page","/page/:page"],(req,res)=>{
 	 //	[]요청 http://127.0.0.1:3000/page
 	 //	[]요청 http://127.0.0.1:3000/page/1->1이라는 값은 :page에 전달..?
 	 var page = req.params.page; //query는 ?뒤에 받는 방식임.
-	 if(!page) page= "미선택";//위에 페이지가 존재하지 않는다면 undefind로 나타나는 페이지가 없다면..
+	 if(!page) page= "미선택";//위에 페이지가 존재하지 않는다면 undefiend로 나타나는 페이지가 없다면..
 //	res.send(`<h1>${page}페이지 입니다.</h1>`); render
 	var title = "도서목록";
 	var css = "page";
