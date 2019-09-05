@@ -2,6 +2,20 @@ function onSend(f){
 	console.log(f);
 	//return true;-> 리턴값을 받아 전송됨.
 	if(f.comment.value.trim() == ""){
+		alert("작성자를 입력하세요.");
+		f.writer.focus();
+		return false;
+	}
+	return true;
+}
+	if(f.pw.value.trim().length > 16 || f.pw.value.trim().length<8){
+		alert("비밀번호는 8~16자로 입력하세요.");
+		f.pw.focus();
+		return false;
+	}
+	return true;
+}
+	if(f.comment.value.trim() == ""){
 		alert("내용을 입력하세요.");
 		f.comment.focus();
 		return false;
