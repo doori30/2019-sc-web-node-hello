@@ -71,6 +71,8 @@ app.get(["/gbook","/gbook/:type"],(req,res)=>{
 
 //방명록을 Ajax 통신으로 데이터만 보내주는 방식
 app.get("/gbook_ajax",(req,res)=>{
+//                     요구,응답.   
+// 요청하면 응답을 함..대신 응답내용이 있어야함.
 	var gb_ajax =req.params.ajax;
 	if(!gb_ajax) gb_ajax = "미선택";
 	const title = "방명록-Ajax";
