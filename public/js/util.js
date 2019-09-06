@@ -22,23 +22,23 @@ function dspDate(d, type) {
 	type 5: 11시 11분 12초'
 	*/
 
-	switch (type) {
-		case 1:
+	switch(type) {
+		case 1 :
 			returnStr = year + month + day + hour + min;
 			break;
-		case 2:
+		case 2 :
 			returnStr = year + month + day + hour;
 			break;
-		case 3:
+		case 3 :
 			returnStr = year + month + day;
 			break;
-		case 4:
+		case 4 :
 			returnStr = month + day;
 			break;
-		case 5:
+		case 5 :
 			returnStr = hour + min + sec;
 			break;
-		default:
+		default :
 			returnStr = year + month + day + hour + min + sec;
 			break;
 	}
@@ -79,3 +79,22 @@ function includeHTML() {
 }
 
 includeHTML();
+
+//사용자 정의 ajax함수.
+function ajax(url, type, vals, cb){
+	//var data = {};//{객체를 만들때}
+	/* if(typeof vals == Object)	data=vals;//객체req.query
+	else url = url + "/" + vals; //req.params 
+ */
+	$.ajax({
+		type: type,
+		url: url, //"/gbook_ajax/1"
+		data: vals, //{grpCnt:10}
+		dataType: "json",
+		error: function(xhr,status,error){
+			console.log(xhr,status,error);
+		},
+		success: cb
+	});
+}
+

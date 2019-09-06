@@ -39,6 +39,9 @@ SELECT * FROM gbook WHERE comment  LIKE = '%하이%' ORDER BY id DESC
 --원하는 갯수만 가져오기
 SELECT * FROM gbook WHERE comment LIKE '%마디%' ORDER BY id DESC LIMIT 0,5 --몇번째, 몇개가져오기 
 SELECT * FROM gbook WHERE comment LIKE '%마디%' ORDER BY id DESC LIMIT 10,5 
+
+--레코드의 갯수를 가져오기
+SELECT count(id) FROM gbook
 ```
 
 

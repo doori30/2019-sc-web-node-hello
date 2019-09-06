@@ -70,17 +70,47 @@ app.get(["/gbook","/gbook/:type"],(req,res)=>{
 });
 
 //방명록을 Ajax 통신으로 데이터만 보내주는 방식
+//디자인준비.
 app.get("/gbook_ajax",(req,res)=>{
 //                     요구,응답.   
 // 요청하면 응답을 함..대신 응답내용이 있어야함.
-	var gb_ajax =req.params.ajax;
-	if(!gb_ajax) gb_ajax = "미선택";
+	// var gb_ajax =req.params.ajax;
+	// if(!gb_ajax) gb_ajax = "미선택";
 	const title = "방명록-Ajax";
 	const css  = "gbook_ajax"
 	const js = "gbook_ajax"
-	const vals = {title,css,js}
-	res.render("gbook_ajax",vals);
+	const vals = {title,css,js};
+	// {title:title, ▲값이 같아서 생략.
+	// css: css,
+	// js: js,}
+	res.render("gbook_ajax",vals);//pug
 });
+//통신받을 준비.
+app.get("/gbook_ajax/:page",(req,res)=>{
+	//page요청을 받으면.
+	//var sql = "SELECT count(id) FROM gbook";
+	var page = Number(req.params.page); //gbook_ajax.js의 1
+	var grpCnt = Number(req.query.grpCnt);//10
+	//문자라서 숫자열로 바꿔줌.
+	//http://127.0.0.1:3000/gbook_ajax/1(url)?(주소부와 쿼리를 이어주는 문자)grpCnt=10{grpCnt:10}
+	//한페이지에 보여질 목록 갯수(1페이지 5개씩)gbook_ajax에서 받아옴 {grpCnt:10}
+	var stRec = (page - 1) * grpCnt;  
+	//목록을 가져오기 위해 목록의 시작 INDEX
+	var vals = []; //query에 보내질 ? 값
+	var reData = []; //res.json에 보내질 데이터값(reData)
+	//총 페이지 수 가져오기
+	var sql = "SELECT count(id) FROM gbook";
+	sqlExec(sql).then((data) => {
+		reData.push({totCnt: data[0][0]["count(id)"]}); //0번의 0번 count id데이터(데이터를 분석) 개체를 푸쉬.
+		sql = "SELECT *FROM gbook ORDER BY id DESC LIMIT ?, ?"
+		vals = [stRec, grpCnt];
+		sqlExec(sql,vals).then((data) => {
+			reData.push(data[0]);
+			res.json(reData); //1번데이터
+		}).catch(sqlErr); //페이지수 가져오는 cb
+	}).catch(sqlErr); 
+});
+//1page=0~4 2page=5~9 3page=10~14...
 
 //router 영역-POST
 app.post("/gbook_save", (req, res) => {
