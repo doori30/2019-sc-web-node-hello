@@ -37,9 +37,9 @@ ajax("/gbook_ajax/1", "get", {grpCnt:3}, function(data){
 	//page 1요청을 받으면 cb함수을 실행.
 	//1->(util-사용자 정의 ajax함수.)
 	console.log(data);//배열안의 자바개체
-	console.log(data[1]); //자바개체 
-	var totCnt = data[0].totCnt;//개체수
-	var rs = data[1];
+	console.log(data[0]); //자바개체 
+	var totCnt = data[0].totCnt;//데이터 전체갯수(pager를 위해서 만들어놓음.)
+	var rs = data[1]; //1페이지에 보여질 데이터
 	var html = '';
 
 	$(".gbook-tb > tbody").empty();

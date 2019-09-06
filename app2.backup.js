@@ -29,9 +29,11 @@ app.locals.pretty = true; //사용자의 정렬을 예쁘게 정리해줌.beauti
 
 //router 영역-GET
 app.get(["/page","/page/:page"],(req,res)=>{
+	 //	[]요청 http://127.0.0.1:3000/page
+	 //	[]요청 http://127.0.0.1:3000/page/1->1이라는 값은 :page에 전달..?
 	 var page = req.params.page; //query는 ?뒤에 받는 방식임.
 	 if(!page) page= "미선택";//위에 페이지가 존재하지 않는다면 undefiend로 나타나는 페이지가 없다면..
-														//	res.send(`<h1>${page}페이지 입니다.</h1>`); render
+//	res.send(`<h1>${page}페이지 입니다.</h1>`); render
 	var title = "도서목록";
 	var css = "page";
 	var js = "page";
@@ -70,18 +72,28 @@ app.get(["/gbook","/gbook/:type"],(req,res)=>{
 //방명록을 Ajax 통신으로 데이터만 보내주는 방식
 //디자인준비.
 app.get("/gbook_ajax",(req,res)=>{
+//                     요구,응답.   
+// 요청하면 응답을 함..대신 응답내용이 있어야함.
+	// var gb_ajax =req.params.ajax;
+	// if(!gb_ajax) gb_ajax = "미선택";
 	const title = "방명록-Ajax";
 	const css  = "gbook_ajax"
 	const js = "gbook_ajax"
 	const vals = {title,css,js};
-		res.render("gbook_ajax",vals);//pug
+	// {title:title, ▲값이 같아서 생략.
+	// css: css,
+	// js: js,}
+	res.render("gbook_ajax",vals);//pug
 });
-
 //통신받을 준비.
 app.get("/gbook_ajax/:page",(req,res)=>{
+	//page요청을 받으면.
+	//var sql = "SELECT count(id) FROM gbook";
 	var page = Number(req.params.page); //gbook_ajax.js의 1
 	var grpCnt = Number(req.query.grpCnt);//10
 	//문자라서 숫자열로 바꿔줌.()
+	//http://127.0.0.1:3000/gbook_ajax/1(url)?(주소부와 쿼리를 이어주는 문자)grpCnt=10{grpCnt:10}
+	//한페이지에 보여질 목록 갯수(1페이지 5개씩)gbook_ajax에서 받아옴 {grpCnt:10}
 	var stRec = (page - 1) * grpCnt;  
 	//목록을 가져오기 위해 목록의 시작 INDEX
 	var vals = []; //query에 보내질 ? 값
@@ -89,7 +101,7 @@ app.get("/gbook_ajax/:page",(req,res)=>{
 	//총 페이지 수 가져오기
 	var sql = "SELECT count(id) FROM gbook";
 	sqlExec(sql).then((data) => {
-		reData.push({totCnt: data[0][0]["count(id)"]});
+		reData.push({totCnt: data[0][0]["count(id)"]}); //0번의 0번 count id데이터(데이터를 분석) 개체를 푸쉬.
 		sql = "SELECT *FROM gbook ORDER BY id DESC LIMIT ?, ?"
 		vals = [stRec, grpCnt];
 		sqlExec(sql,vals).then((data) => {
@@ -108,8 +120,8 @@ app.post("/gbook_save", (req, res) => {
 	const sql = "INSERT INTO gbook SET comment=?, wtime=?, writer=?,pw=?"; 
 	//? 안에 들어갈 내용을 const data = await connect.query(sql, vals); 에서 받아서 실행해줌.
 	const vals = [comment, util.dspDate(new Date()),writer,pw];
-	sqlExec(sql, vals).then((data) => {
-		console.log(data);
-		res.redirect("/gbook");
+	sqlExec(sql, vals).then((data) => {//promise를 리턴 불러오는 개체.구체적으로 편하게 찾기위해 사용하는 함수가 then
+		console.log(data);               //콜백을 simple하게 만들어줌. mysql에 대한 결과값을 보여줌.
+		res.redirect("/gbook");          //input에 글남긴후 다시 gbook으로 돌아옴.
 	}).catch(sqlErr);
 });
