@@ -86,19 +86,46 @@ app.get("/gbook_ajax/:page",(req,res)=>{
 	//목록을 가져오기 위해 목록의 시작 INDEX
 	var vals = []; //query에 보내질 ? 값
 	var reData = []; //res.json에 보내질 데이터값(reData)
-	//총 페이지 수 가져오기
-	var sql = "SELECT count(id) FROM gbook";
-	sqlExec(sql).then((data) => {
-		reData.push({totCnt: data[0][0]["count(id)"]});
+	var sql;
+	var result;
+	var reData = {};
+
+/* 
+	totcnt:2,
+	rs:[
+		{id:1, comment:"",wtime:"",writer:""},
+		{id:1, comment:"",wtime:"",writer:""}
+	]
+*/
+
+(async() => {
+	//총 페이지 수 가져오기(데이터 배열을 개체로 바꾸기)
+		sql = "SELECT count(id) FROM gbook";
+		result = await sqlExec(sql);
+		reData.totCnt = result[0][0]["count(id)"];
+
+		//레코드 가져오기
 		sql = "SELECT *FROM gbook ORDER BY id DESC LIMIT ?, ?"
 		vals = [stRec, grpCnt];
-		sqlExec(sql,vals).then((data) => {
-			reData.push(data[0]);
-			res.json(reData); //1번데이터
-		}).catch(sqlErr); //페이지수 가져오는 cb
-	}).catch(sqlErr); 
+		result = await sqlExec(sql,vals);
+		reData.rs = result[0];
+		res.json(reData); 
+	})();
 });
-//1page=0~4 2page=5~9 3page=10~14...
+
+//  (async() => {
+// 		sql = "SELECT count(id) FROM gbook";
+// 		result = await sqlExec(sql);
+// 		reData.push({totCnt: result[0][0]["count(id)"]});
+
+// 		//레코드 가져오기
+// 		sql = "SELECT *FROM gbook ORDER BY id DESC LIMIT ?, ?"
+// 		vals = [stRec, grpCnt];
+// 		result = await sqlExec(sql,vals);
+// 		reData.push(result[0]);
+// 		res.json(reData); //1번데이터
+// 	});
+// });
 
 //router 영역-POST
 app.post("/gbook_save", (req, res) => {

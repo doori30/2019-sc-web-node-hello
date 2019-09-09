@@ -33,30 +33,44 @@ xhr.addEventListener('load',function(){
 // 		success: cb
 // 	});
 // }
-ajax("/gbook_ajax/1", "get", {grpCnt:3}, function(data){
-	//page 1요청을 받으면 cb함수을 실행.
-	//1->(util-사용자 정의 ajax함수.)
-	console.log(data);//배열안의 자바개체
-	console.log(data[0]); //자바개체 
-	var totCnt = data[0].totCnt;//데이터 전체갯수(pager를 위해서 만들어놓음.)
-	var rs = data[1]; //1페이지에 보여질 데이터
-	var html = '';
+function getPage(page) {
+	var grpCnt = 5;
+	var divCnt = 3;
+	ajax("/gbook_ajax/"+page, "get", {grpCnt: grpCnt}, function 
+	(data){                             //한페이지에 보여지는 갯수
+		//page 1요청을 받으면 cb함수을 실행.
+		//1->(util-사용자 정의 ajax함수.)
+		console.log(data); //배열안의 자바개체
+		//console.log(data[0]); //자바개체 
+		var totCnt = data.totCnt; //데이터 전체갯수(pager를 위해서 만들어놓음.)
+		/* 
+	totcnt:2,
+	rs:[
+		{id:1, comment:"",wtime:"",writer:""},
+		{id:1, comment:"",wtime:"",writer:""}
+	]
+*/
+		var rs = data.rs; //1페이지에 보여질 데이터
+		var html = '';
 
-	$(".gbook-tb > tbody").empty();
-	//내용을 지우고 작성되어있는 내용을 가져옴.
-	for(var i in rs){
-		html = '<tr>';
-		html += '<td>'+rs[i].id+'</td>';
-		html += '<td>'+rs[i].writer+'</td>';
-		html += '<td>'+dspDate(new Date (rs[i].wtime))+'</td>';
-		html += '<td>'+rs[i].comment+'</td>';
-		html += '<td>';
-		html += '<button class="btn btn-success btn-sm">수정</button>';
-		html += '<button class="btn btn-danger btn-sm">삭제</button>';
-		html += '</td>';
-		$(".gbook-tb > tbody").append(html);
-	}
-});
-//html을 실행함.
-
-
+		$(".gbook-tb > tbody").empty();
+		//내용을 지우고 작성되어있는 내용을 가져옴.
+		for (var i in rs) {
+			html = '<tr>';
+			html += '<td>' + rs[i].id + '</td>';
+			html += '<td>' + rs[i].writer + '</td>';
+			html += '<td>' + dspDate(new Date(rs[i].wtime)) + '</td>';
+			html += '<td>' + rs[i].comment + '</td>';
+			html += '<td>';
+			html += '<button class="btn btn-success btn-sm">수정</button>';
+			html += '<button class="btn btn-danger btn-sm">삭제</button>';
+			html += '</td>';
+			$(".gbook-tb > tbody").append(html);
+		}
+		//pagerMaker($pager. grpcnt, totCnt, page) ->java객체로도 바꿔볼 것.
+		pagerMaker($(".pager"), grpCnt, divCnt, totCnt, page, function () {
+			if(!$(this).hasClass("disabled")) getPage($(this).data("page"));
+		});
+	});
+}
+getPage(1);
