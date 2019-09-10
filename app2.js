@@ -112,6 +112,8 @@ app.get(["/gbook", "/gbook/:type", "/gbook/:type/:id"], (req, res) => {
 	}
 });
 
+
+
 //방명록을 Ajax 통신으로 데이터만 보내주는 방식
 //디자인준비.
 app.get("/gbook_ajax", (req, res) => {
