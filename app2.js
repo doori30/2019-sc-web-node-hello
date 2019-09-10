@@ -131,7 +131,7 @@ app.get("/gbook_ajax/:page", (req, res) => {
 	var page = Number(req.params.page); //gbook_ajax.js의 1
 	var grpCnt = Number(req.query.grpCnt); //10
 	//문자라서 숫자열로 바꿔줌.()
-	// var stRec = (page - 1) * grpCnt; ->pager에 옮김
+	 var stRec = (page - 1) * grpCnt;// ->pager에 옮김
 	//목록을 가져오기 위해 목록의 시작 INDEX
 	var vals = []; //query에 보내질 ? 값
 	var reData = []; //res.json에 보내질 데이터값(reData)
