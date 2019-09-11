@@ -20,3 +20,8 @@ return true;
 }
 // 입력이 없으면  alert창이 뜨고 멈추고
 // 입력이 되면 true값을 받아서 전송  (js방식으로 브라우저에서)
+
+$(".page-item").click(function(){
+	var n =	$(this).data("page");
+	if(n !== undefined) location.href = "/gbook/li/"+n;
+});
