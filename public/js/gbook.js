@@ -26,6 +26,7 @@ $(".page-item").click(function(){
 	if(n !== undefined) location.href = "/gbook/li/"+n;
 });
 
+//상세내용보기 - modal POPUP
 $("#gbook-tb td").not(":last-child").click(function(){
 	var id = $(this).parent().children("td").eq(0).text();
 	$.ajax({
@@ -42,6 +43,18 @@ $("#gbook-tb td").not(":last-child").click(function(){
 	});
 	//          td 부모한테 그중 0번째 아이의 글을 찾아서 변수id에 담음.
 })
+
+//삭제
+$(".btRev").click(function(){
+	var id = $(this).parent().parent().children("td").eq(0).text(); 
+	//버튼으로 부터 찾아감.
+	//$("form[name='removeForm']").find("input[name='id']")
+	$("#removw-modal").find("input[name='id']").val(id);
+	$("#removw-modal").find("input[name='pw']").val('');
+	$("#removw-modal").find("input[name='pw']").focus();//보류
+	$("#remove-modal").modal("show");
+})
+
 
 // $("#bt-close").click(function(){
 // 	$("#gbook-modal").modal("hide");
