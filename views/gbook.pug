@@ -7,7 +7,7 @@ html(lang="ko")
 		.container.my-3
 			.jumbotron
 				h2= `${title}`
-			table.table.table-bordered.table-hover.my-3.text-center
+			table#gbook-tb.table.table-bordered.table-hover.my-3.text-center
 				colgroup
 					col(width="8%")
 					col(width="15%")
@@ -33,6 +33,7 @@ html(lang="ko")
 								button.btn.btn-danger.btn-sm 삭제
 								
 			include ./inc/pager.pug
+		include ./inc/modal.pug
 		include ./inc/footer.pug
 		include ./inc/script.pug
 		//-each item in datas->pug가 가지고 있는 반복문 데이터스안에 리스트가 있음.thead-dark

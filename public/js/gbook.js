@@ -25,3 +25,24 @@ $(".page-item").click(function(){
 	var n =	$(this).data("page");
 	if(n !== undefined) location.href = "/gbook/li/"+n;
 });
+
+$("#gbook-tb td").not(":last-child").click(function(){
+	var id = $(this).parent().children("td").eq(0).text();
+	$.ajax({
+		type: "get",
+		url: "/api/modalData",
+		data: {id: id},
+		dataType: "json",
+		success: function (res) {
+			$("#gbook-modal tr").eq(0).children("td").eq(1).html(res.writer);
+			$("#gbook-modal tr").eq(1).children("td").eq(1).html(dspDate(new Date(res.wtime)));
+			$("#gbook-modal tr").eq(2).find("div").html(res.comment);
+			$("#gbook-modal").modal("show");
+		}
+	});
+	//          td 부모한테 그중 0번째 아이의 글을 찾아서 변수id에 담음.
+})
+
+// $("#bt-close").click(function(){
+// 	$("#gbook-modal").modal("hide");
+// });
