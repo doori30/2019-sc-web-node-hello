@@ -6,8 +6,8 @@ function onSend(f){
 		f.writer.focus();
 		return false;
 }
-	if(f.pw.value.trim().length > 16 || f.pw.value.trim().length<8){
-		alert("비밀번호는 8~16자로 입력하세요.");
+	if(f.pw.value.trim().length > 16 || f.pw.value.trim().length<6){
+		alert("비밀번호는 6 ~ 16 자로 입력하세요.");
 		f.pw.focus();
 		return false;
 }
@@ -20,6 +20,19 @@ return true;
 }
 // 입력이 없으면  alert창이 뜨고 멈추고
 // 입력이 되면 true값을 받아서 전송  (js방식으로 브라우저에서)
+
+function onRev(f) {
+	if(f.id.value.trim() == "") {
+		alert("삭제할 데이터의 id가 필요합니다.");
+		 return false;
+	}
+	if(f.pw.value.trim().length > 16 || f.pw.value.trim().length<6) {
+		alert("비밀번호는 6 ~ 16 자 입니다.");
+		 f.pw.focus();
+		 return false;
+	}
+	return true;
+}
 
 $(".page-item").click(function(){
 	var n =	$(this).data("page");
@@ -48,10 +61,10 @@ $("#gbook-tb td").not(":last-child").click(function(){
 $(".btRev").click(function(){
 	var id = $(this).parent().parent().children("td").eq(0).text(); 
 	//버튼으로 부터 찾아감.
-	//$("form[name='removeForm']").find("input[name='id']")
-	$("#removw-modal").find("input[name='id']").val(id);
-	$("#removw-modal").find("input[name='pw']").val('');
-	$("#removw-modal").find("input[name='pw']").focus();//보류
+	$("form[name='removeForm']").find("input[name='id']");
+	$("#remove-modal").find("input[name='id']").val(id);
+	$("#remove-modal").find("input[name='pw']").val('');
+	$("#remove-modal").find("input[name='pw']").focus();//보류
 	$("#remove-modal").modal("show");
 })
 

@@ -86,7 +86,12 @@ app.get(["/gbook", "/gbook/:type", "/gbook/:type/:id"], (req, res) => {
 				result = await sqlExec(sql);
 				totCnt = result[0][0]["count(id)"];
 				//
-				const pagerVal = pager.pagerMaker({totCnt, grpCnt, divCnt, page}); //pager.js에서 obj객체로 만들어서  여기서 요청을 하면 예외처리에서 먼저 확인을 거쳐서 작업을 진행. 
+				const pagerVal = pager.pagerMaker({
+					totCnt,
+					grpCnt,
+					divCnt,
+					page
+				}); //pager.js에서 obj객체로 만들어서  여기서 요청을 하면 예외처리에서 먼저 확인을 거쳐서 작업을 진행. 
 				sql = "SELECT * FROM gbook ORDER BY id DESC limit ?,?";
 				sqlVal = [pagerVal.stRec, pagerVal.grpCnt];
 				result = await sqlExec(sql, sqlVal);
@@ -95,7 +100,7 @@ app.get(["/gbook", "/gbook/:type", "/gbook/:type/:id"], (req, res) => {
 				vals.pager = pagerVal;
 				for (let item of vals.datas) item.wtime = util.dspDate(new Date(item.wtime));
 				pug = "gbook";
-				res.render(pug,vals);
+				res.render(pug, vals);
 			})(); //즉시실행
 
 			// var sql =
@@ -112,34 +117,80 @@ app.get(["/gbook", "/gbook/:type", "/gbook/:type/:id"], (req, res) => {
 	}
 });
 
-app.get("/api/:type",(req,res) =>{
+//http://127.0.0.1/api/
+app.get("/api/:type", (req, res) => {
 	var type = req.params.type;
 	var id = req.query.id;
 	var pw = req.query.pw;
 	var sql;
 	var vals = [];
 	var result;
-	switch(type) {
+	switch (type) {
+		//http://127.0.0.1/api/modalData?id=2
 		case "modalData":
-			if(id === undefined || pw === undefined) req.redirect("/500.html");
-			else{
+			if (id === undefined || pw === undefined) req.redirect("/500.html");
+			else {
 				sql = "SELECT * FROM gbook WHERE id=?"
 				vals.push(id);
-				(async ()=>{
+				(async () => {
 					result = await sqlExec(sql, vals);
 					res.json(result[0][0]);
 				})();
 			}
 			break;
+			//http://127.0.0.1/api/remove?id=2&pw=11111111
+			// case "remove":
+			// 	if(id ===undefined) req.redirect("/500.html");
+			// 	else{
+			// 		sql = "DELETE FROM gbook WHERE id=? AND pw=?";
+			// 		vals.push(id);
+			// 		vals.push(pw);
+			// 		(async () => {
+			// 			result = sqlExec(sql, vals);
+			// 			res.json(result);
+			// 		})();
+			// 	}
+			// 	break;
+		default:
+			res.redirect("/404.html");
+			break;
+	}
+});
+
+app.post("/api/:type", (req, res) => {
+	var type = req.params.type;
+	var id = req.body.id;
+	var pw = req.body.pw;
+	var page = req.body.page;
+	var sql ="";
+	var vals = [];
+	var result;
+	var html;
+	switch (type) {
 		case "remove":
-			if(id ===undefined) req.redirect("/500.html");
-			else{
-				sql = "DELETE FROM gbook WHERE id=? AND pw=?";
+//http://127.0.0.1/api/remove?id=2&pw=11111111
+			if (id === undefined || pw === undefined) res.redirect("/500.html");
+			else {
+				sql = "DELETE FROM gbook WHERE id=? AND pw=?"; 
+				//WHERE을 꼭 붙여야 필요한 내용을 지울 수 있다. 아니면 전체를 지우게 됨.
 				vals.push(id);
-				vals.push(pw);
+				vals.push(pw); 
+				//push를 해서 배열에 채워줌.
 				(async () => {
-					result = sqlExec(sql, vals);
-					res.json(result);
+					result = await sqlExec(sql, vals);
+					if(result[0].affectedRows == 1) res.redirect("/gbook/li/"+page);
+					else {
+						html = `
+						<meta charset="utf-8">
+						<script>
+						alert("패스워드가 올바르지 않습니다.");
+						history.go(-1);
+						</script>
+						`;
+						res.send(html);
+						//이동하는 페이지(history)에서 이전페이지로 돌아가기
+					}
+					// res.json(result);-> 죽이지 않으면 또 result가 돌아서 오류남.
 				})();
 			}
 			break;
@@ -151,8 +202,7 @@ app.get("/api/:type",(req,res) =>{
 
 
 
-
-
+//방명록을 Ajax구현
 //방명록을 Ajax 통신으로 데이터만 보내주는 방식
 //디자인준비.
 app.get("/gbook_ajax", (req, res) => {
@@ -172,7 +222,7 @@ app.get("/gbook_ajax/:page", (req, res) => {
 	var page = Number(req.params.page); //gbook_ajax.js의 1
 	var grpCnt = Number(req.query.grpCnt); //10
 	//문자라서 숫자열로 바꿔줌.()
-	 var stRec = (page - 1) * grpCnt;// ->pager에 옮김
+	var stRec = (page - 1) * grpCnt; // ->pager에 옮김
 	//목록을 가져오기 위해 목록의 시작 INDEX
 	var vals = []; //query에 보내질 ? 값
 	var reData = []; //res.json에 보내질 데이터값(reData)
