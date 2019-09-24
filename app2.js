@@ -73,7 +73,6 @@ app.get(["/gbook", "/gbook/:type", "/gbook/:type/:id"], (req, res) => {
 			vals.title = "방명록 작성";
 			pug = "gbook_in";
 			res.render(pug, vals);
-
 			break;
 		case "li":
 			(async () => {
@@ -162,34 +161,36 @@ app.post("/api/:type", (req, res) => {
 	var id = req.body.id;
 	var pw = req.body.pw;
 	var page = req.body.page;
-	var sql ="";
+	var sql = "";
 	var vals = [];
 	var result;
 	var html;
 	switch (type) {
 		case "remove":
-//http://127.0.0.1/api/remove?id=2&pw=11111111
+			//http://127.0.0.1/api/remove?id=2&pw=11111111
 			if (id === undefined || pw === undefined) res.redirect("/500.html");
 			else {
-				sql = "DELETE FROM gbook WHERE id=? AND pw=?"; 
+				sql = "DELETE FROM gbook WHERE id=? AND pw=?";
 				//WHERE을 꼭 붙여야 필요한 내용을 지울 수 있다. 아니면 전체를 지우게 됨.
 				vals.push(id);
-				vals.push(pw); 
+				vals.push(pw);
 				//push를 해서 배열에 채워줌.
 				(async () => {
 					result = await sqlExec(sql, vals);
-					if(result[0].affectedRows == 1) res.redirect("/gbook/li/"+page);
-					else {
-						html = `
-						<meta charset="utf-8">
-						<script>
-						alert("패스워드가 올바르지 않습니다.");
-						history.go(-1);
-						</script>
-						`;
-						res.send(html);
-						//이동하는 페이지(history)에서 이전페이지로 돌아가기
+					html = `<meta charset="utf-8"><script>`;
+					if (result[0].affectedRows == 1) //res.redirect("/gbook/li/"+page+"?chk=remove");
+						{
+							html += 'alert("삭제되었습니다.");';
+							html += 'location.href = "/gbook/li/'+page+'"';
+						}
+					else{
+						html += 'alert("패스워드가 올바르지 않습니다.");';
+						html += 'history.go(-1)';
 					}
+					html += `</script>`;
+					res.send(html);
+					//이동하는 페이지(history)에서 이전페이지로 돌아가기
+					//res는 셋 중 하나만 동작함.
 					// res.json(result);-> 죽이지 않으면 또 result가 돌아서 오류남.
 				})();
 			}
