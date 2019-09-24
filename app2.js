@@ -127,7 +127,7 @@ app.get("/api/:type", (req, res) => {
 	switch (type) {
 		//http://127.0.0.1/api/modalData?id=2
 		case "modalData":
-			if (id === undefined || pw === undefined) req.redirect("/500.html");
+			if (id === undefined) res.redirect("/500.html");
 			else {
 				sql = "SELECT * FROM gbook WHERE id=?"
 				vals.push(id);
@@ -178,7 +178,7 @@ app.post("/api/:type", (req, res) => {
 				(async () => {
 					result = await sqlExec(sql, vals);
 					html = `<meta charset="utf-8"><script>`;
-					if (result[0].affectedRows == 1) //res.redirect("/gbook/li/"+page+"?chk=remove");
+					if (result[0].affectedRows == 1)//res.redirect("/gbook/li/"+page+"?chk=remove");
 						{
 							html += 'alert("삭제되었습니다.");';
 							html += 'location.href = "/gbook/li/'+page+'"';
@@ -281,3 +281,5 @@ app.post("/gbook_save", (req, res) => {
 		res.redirect("/gbook");
 	}).catch(sqlErr);
 });
+
+

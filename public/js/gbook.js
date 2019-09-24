@@ -57,7 +57,7 @@ $("#gbook-tb td").not(":last-child").click(function(){
 	//          td 부모한테 그중 0번째 아이의 글을 찾아서 변수id에 담음.
 })
 
-//삭제
+//삭제기능
 $(".btRev").click(function(){
 	var id = $(this).parent().parent().children("td").eq(0).text(); 
 	//버튼으로 부터 찾아감.
@@ -67,8 +67,29 @@ $(".btRev").click(function(){
 	$("#remove-modal").find("input[name='pw']").focus();//보류
 	$("#remove-modal").modal("show");
 })
-
-
 // $("#bt-close").click(function(){
 // 	$("#gbook-modal").modal("hide");
 // });
+
+
+//수정기능 클라이언트스크립트/서버는 데이터베이스를 처리
+$(".btChg").click(function(){
+	var id = $(this).parent().parent().children("td").eq(0).text(); 
+	$("#update-modal").find("input[name='id']").val(id);
+	$.ajax({
+		type: "get",
+		url: "/api/modalData",
+		data: {id: id},
+		dataType: "json",
+		
+		success: function (res) {
+			$("form[name='upForm']").find("input[name='writer']").val(res.writer);
+			$("form[name='upForm']").find("textarea[name='comment']").val(res.comment);
+			$("#update-modal").modal("show");
+		}
+	});
+});
+
+function onChg(f) {
+	
+};
