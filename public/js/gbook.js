@@ -64,9 +64,13 @@ $(".btRev").click(function(){
 	$("form[name='removeForm']").find("input[name='id']");
 	$("#remove-modal").find("input[name='id']").val(id);
 	$("#remove-modal").find("input[name='pw']").val('');
-	$("#remove-modal").find("input[name='pw']").focus();//보류
 	$("#remove-modal").modal("show");
-})
+});
+	$("#remove-modal").on("shown.bs.modal",function(){
+		$("#remove-modal").find("input[name='pw']").focus();	
+	});
+	//$("#remove-modal").find("input[name='pw']").focus();//보류
+	//document.removeForm.pw.focus();
 // $("#bt-close").click(function(){
 // 	$("#gbook-modal").modal("hide");
 // });
@@ -74,22 +78,29 @@ $(".btRev").click(function(){
 
 //수정기능 클라이언트스크립트/서버는 데이터베이스를 처리
 $(".btChg").click(function(){
-	var id = $(this).parent().parent().children("td").eq(0).text(); 
+	var id = $(this).parent().parent().children("td").eq(0).text();
 	$("#update-modal").find("input[name='id']").val(id);
+	upAjax(id);
+});
+
+function onReset() {
+	var id = $("form[name='upForm']").find("input[name='id']").val();
+	upAjax(id);
+}
+
+function upAjax(id){
 	$.ajax({
 		type: "get",
 		url: "/api/modalData",
 		data: {id: id},
-		dataType: "json",
-		
+		dataType: "json",	
 		success: function (res) {
 			$("form[name='upForm']").find("input[name='writer']").val(res.writer);
 			$("form[name='upForm']").find("textarea[name='comment']").val(res.comment);
 			$("#update-modal").modal("show");
 		}
 	});
-});
-
-function onChg(f) {
-	
 };
+
+//if($(f).find("input[name=''writer]").val().trim();) <-jQuery
+	//if(f.writer.value.trim()) <-javascript

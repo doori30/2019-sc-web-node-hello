@@ -160,6 +160,8 @@ app.post("/api/:type", (req, res) => {
 	var type = req.params.type;
 	var id = req.body.id;
 	var pw = req.body.pw;
+	var writer = req.body.writer;
+	var comment = req.body.comment;
 	var page = req.body.page;
 	var sql = "";
 	var vals = [];
@@ -178,12 +180,11 @@ app.post("/api/:type", (req, res) => {
 				(async () => {
 					result = await sqlExec(sql, vals);
 					html = `<meta charset="utf-8"><script>`;
-					if (result[0].affectedRows == 1)//res.redirect("/gbook/li/"+page+"?chk=remove");
-						{
-							html += 'alert("삭제되었습니다.");';
-							html += 'location.href = "/gbook/li/'+page+'"';
-						}
-					else{
+					if (result[0].affectedRows == 1) //res.redirect("/gbook/li/"+page+"?chk=remove");
+					{
+						html += 'alert("삭제되었습니다.");';
+						html += 'location.href = "/gbook/li/' + page + '"';
+					} else {
 						html += 'alert("패스워드가 올바르지 않습니다.");';
 						html += 'history.go(-1)';
 					}
@@ -192,6 +193,31 @@ app.post("/api/:type", (req, res) => {
 					//이동하는 페이지(history)에서 이전페이지로 돌아가기
 					//res는 셋 중 하나만 동작함.
 					// res.json(result);-> 죽이지 않으면 또 result가 돌아서 오류남.
+				})();
+			}
+			break;
+		case "update":
+			if (id === undefined || pw === undefined) res.redirect("/500.html");
+			else {
+				sql = "UPDATE gbook SET writer=?, comment=? WHERE id=? AND pw=?";
+				vals.push(writer);
+				vals.push(comment);
+				vals.push(id);
+				vals.push(pw);
+				(async () => {
+					result = await sqlExec(sql, vals);
+					html = '<meta charset="utf-8"><script>';
+					if (result[0].affectedRows == 1) {
+						html += 'alert("수정되었습니다.");';
+						html += 'location.href = "/gbook/li/' + page + '";'
+					} 
+					else {
+						html += 'alert("패스워드가 올바르지 않습니다.");';
+						html += 'history.go(-1)';
+					}
+					html += '</script>';
+					res.send(html);
+					//	res.json(result);
 				})();
 			}
 			break;
@@ -281,5 +307,3 @@ app.post("/gbook_save", (req, res) => {
 		res.redirect("/gbook");
 	}).catch(sqlErr);
 });
-
-
