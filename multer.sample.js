@@ -5,7 +5,16 @@ const bodyParser = require("body-parser");
 const util = require("./modules/util");
 const multer = require("multer");
 const splitName = (file)=>{
-	//확장자 처리
+	//확장자 처리    파일문자열
+	//file = lighthouse.jpg
+	//arr = ["lighthouse","jpg"]
+	//arr = ["lighthouse"]
+	//obj = {
+	//time: 1566787873000
+	//ext:arr마지막 놈 "jpg"
+	//name: "1566787873000-80"
+	//saveName: "1566787873000-80.jpg"
+	//}-> 자체를 리턴해줌
 	//var fileName = arr.join("."); // ["a","b","jpg"] ->"a.b.jpg" 합치기
 	var arr = file = file.split("."); //"a.b.jpg" -> ["a","b","jpg"] 나누기
 	var obj ={};
@@ -23,10 +32,10 @@ const storage = multer.diskStorage({
   },
   filename: (req, file, cb) => {
 		var newFile = splitName(file.originalname); //오리지널은 사용자가 업로드한 파일명.
-    cb(null, newFile.saveName);
+    cb(null, newFile.saveName); //파일이 업로드 되는 순간 콜백이 진행 실행됨.
   }
-})
-const upload = multer({ storage: storage })
+});//자바객체
+const upload = multer({ storage: storage }) //const storage :storage 에 담김.
 
 //앱 서버실행
 app.listen(3000, () => {
@@ -59,9 +68,11 @@ app.get(["/multer", "/multer/:type"], (req, res) => {
 });
 
 app.post("/multer_write", upload.single('upfile'), (req,res)=>{
+																				//전달.      -> 위에서 담긴파일
 	var title = req.body.title;
 	// res.send("업로드 되었습니다.")
 	//var file = req.body.upfile;//multer에게 위임하여 전달예정.
 	if(req.file) res.send('<img src="/uploads/sample/'+req.file.filename+'">');
+	//저장된 파일을 보여줌.
 	else res.send("저장되었습니다.");
 });
