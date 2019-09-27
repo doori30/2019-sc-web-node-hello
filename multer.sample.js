@@ -16,7 +16,7 @@ const splitName = (file)=>{
 	//saveName: "1566787873000-80.jpg"
 	//}-> 자체를 리턴해줌
 	//var fileName = arr.join("."); // ["a","b","jpg"] ->"a.b.jpg" 합치기
-	var arr = file = file.split("."); //"a.b.jpg" -> ["a","b","jpg"] 나누기
+	var arr = file.split("."); //"a.b.jpg" -> ["a","b","jpg"] 나누기
 	var obj ={};
 	obj.time = Date.now();
 	obj.ext = arr.pop(); //arr = ["a","b"] 확장자 맨 뒤에 빼내기
