@@ -85,7 +85,8 @@ $(".btChg").click(function(){
 
 function onReset() {
 	var id = $("form[name='upForm']").find("input[name='id']").val();
-	upAjax(id);
+	var pw = $("form[name='upForm']").find("input[name='pw']").val("");
+	upAjax(id,pw);
 }
 
 function upAjax(id){

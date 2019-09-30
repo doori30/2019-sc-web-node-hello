@@ -13,6 +13,7 @@ const bodyParser = require("body-parser") //get 방식.
 const util = require("./modules/util"); // 내가만든 것 불러오기
 const db = require("./modules/mysql_conn"); // 내가만든 것 불러오기
 const pager = require("./modules/pager"); //요청들어오면 처리해줌.
+const mt = require("./modules/multer_conn");
 
 //전역변수 선언
 const sqlPool = db.sqlPool;
@@ -295,15 +296,41 @@ app.get("/gbook_ajax/:page", (req, res) => {
 // });
 
 //router 영역-POST
-app.post("/gbook_save", (req, res) => {
+app.post("/gbook_save", mt.upload.single("upfile") ,(req, res) => {
+	//                                                req.fileValidateError = "Y"; 
 	const writer = req.body.writer;
 	const pw = req.body.pw;
 	const comment = req.body.comment;
-	const sql = "INSERT INTO gbook SET comment=?, wtime=?, writer=?,pw=?";
+	var orifile;//실제파일
+	var savefile;//저장된 파일->multer에서 받음
+	if(req.file){//업로드가 안되면  undefined로 빈문서가 들어감.,화면에 글은 작성되지만 파일이 올라가지 않는다.
+		orifile = req.file.originalname;
+		savefile = req.file.filename; 
+	}
+	var result;
+
+	const sql = "INSERT INTO gbook SET comment=?, wtime=?, writer=?,pw=?, orifile=?, savefile=?";
 	//? 안에 들어갈 내용을 const data = await connect.query(sql, vals); 에서 받아서 실행해줌.
-	const vals = [comment, util.dspDate(new Date()), writer, pw];
-	sqlExec(sql, vals).then((data) => {
-		console.log(data);
-		res.redirect("/gbook");
-	}).catch(sqlErr);
+	const vals = [comment, util.dspDate(new Date()), writer, pw, orifile, savefile];
+	(async () => {
+		result = await sqlExec(sql, vals);
+		//if(result[0].affectedRows > 0)res.redirect("gbook");
+		if(result[0].affectedRows > 0){
+			if(req.fileValidateError == "Y"){
+				html = '<meta charser="utf-8">';
+				html += '<script>';
+				html += 'alert("업로드가 허용되지 않는 파일이므로 파일은 업로드 되지 않습니다.");';
+				html += 'location.href="/gbook";';
+				html += '</script>';
+				res.send(html);
+			}
+			else res.redirect("/gbook");
+		}
+		else res.redirect("/500.html");
+	})();
 });
+	// ▲ async,await로 바꿈
+	//	sqlExec(sql, vals).then((data) => {
+	// 	console.log(data);
+	// 	res.redirect("/gbook");
+	// }).catch(sqlErr);
