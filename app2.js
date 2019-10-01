@@ -180,7 +180,6 @@ app.post("/api/:type", (req, res) => {
 				//push를 해서 배열에 채워줌.
 				(async () => {
 					result = await sqlExec(sql, vals);
-					html = `<meta charset="utf-8"><script>`;
 					if (result[0].affectedRows == 1) obj.msg =  "삭제되었습니다.";
 					//res.redirect("/gbook/li/"+page+"?chk=remove");
 					else obj.msg = "패스워드가 올바르지 않습니다.";
@@ -202,7 +201,6 @@ app.post("/api/:type", (req, res) => {
 				vals.push(pw);
 				(async () => {
 					result = await sqlExec(sql, vals);
-					html = '<meta charset="utf-8"><script>';
 					if (result[0].affectedRows == 1) 	obj.msg = "수정되었습니다.";
 					else obj.msg = "패스워드가 올바르지 않습니다.";
 						obj.loc = "/gbook/li/" + page ;
