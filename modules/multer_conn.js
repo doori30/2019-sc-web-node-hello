@@ -21,18 +21,23 @@ const fileExt = ["hwp", "xls", "xlsx", "ppt", "pptx", "doc", "docx", "txt", "zip
 const chkExt = (req, file, cb) => {
 	//확장자 존재여부 확인(multer와 연결하여 쓸 예정..)
 	var ext = splitName(file.originalname).ext.toLowerCase();
-	if(imgExt.indexOf(ext) > -1 || fileExt.indexOf(ext) > -1) cb(null, true);
+	if(imgExt.indexOf(ext) > -1 || fileExt.indexOf(ext) > -1) {
+		req.fileValidateError = true; 
+	cb(null, true);}
 	//배열로부터 인덱스로 찾음 (파일로 받아서 실제 이름을 spliName넣음) 확장자를 찾아서 존재한다면 진행.(-1은 없다는 뜻.)
 	else {
-		req.fileValidateError = "Y"; //파일 확인에러=Y ->req로 받음.
+		req.fileValidateError = false; //파일 확인에러=Y ->req로 받음.
 		cb(null, false);
 	}
 }
 
 //저장 될 폴더를 생성
+//1.생성할 폴더가 존재한다면 폴더 절대경로 문자열을 리턴
+//2.생성할 폴더가 존재하지 않으면 폴더를 절대경로 리턴
 const getPath = () => {
-	var dir = makePath();//dir: 1909
-	var newPath = path.join(__dirname, "../public/uploads/"+dir);
+	//var dir = makePath();//dir: 1909
+	var newPath = path.join(__dirname, "../public/uploads/"+makePath());
+	//                  +    절대경로    상대경로
 	if(!fs.existsSync(newPath)){
 		//fs.exists동기/ 지금쓰는것은 비동기 존재여부 확인 true=존재o fals=존재x
 	fs.mkdir(newPath, (err) => {
@@ -43,13 +48,17 @@ const getPath = () => {
 	return newPath;
 }
 
+//자바스크립트 Date객체에서 현재의 년도와 월을 (예:1909)문자열로 리턴한다.
 const makePath = () => {
 	var d = new Date(); //2019-09-03 16:29:22 GMp(...)날짜객체
-	var year = d.getFullYear() + "";
-	var month ;
-	if(d.getMonth() + 1 < 10) month= "0" + (d.getMonth() + 1);
-	else month = "" + (d.getMonth + 1); 
-	return year.substr(2) + month;
+	//var year = d.getFullYear() + "";//문자열로 만들기 위해 ""붙임.
+	//          넘버
+	var year = String(d.getFullYear()).substr(2) ; //Number()
+	var month = d.getMonth()+1 ;
+	if(d.getMonth() + 1 < 10) month = "0" + month;
+	//else month = "" + (d.getMonth + 1); 
+	return year + month; //리턴값1909 newPath에 makePath담김 
+	//return year.substr(2) + month;
 	//             0,1,2번부터~
 }
 
@@ -58,8 +67,8 @@ const storage = multer.diskStorage({
   destination: (req, file, cb) => {
 		cb(null, getPath());
 	//	cb(null, path.join(__dirname, '../public/uploads/'+getPath()));
-	 //__dirname: modules의 절대 경로(d:/JDR/17.node-hello/modules)
-	 //위의 절대경로에 상대경로를 붙인다.
+	//__dirname: modules의 절대 경로(d:/JDR/17.node-hello/modules)
+	//위의 절대경로에 상대경로를 붙인다.
   },
   filename: (req, file, cb) => {
 		var newFile = splitName(file.originalname); //오리지널은 사용자가 업로드한 파일명.
@@ -68,8 +77,8 @@ const storage = multer.diskStorage({
 });
 
 //storage 객체를 이용하여 멀터를 초기화(생성) 한다.
-const upload = multer({ storage: storage, fileFilter: chkExt });
-
+const upload = multer({storage: storage, fileFilter: chkExt});
+//																						필터링
 module.exports = {
 	splitName,
 	upload,

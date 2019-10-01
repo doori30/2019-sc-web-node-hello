@@ -167,7 +167,7 @@ app.post("/api/:type", (req, res) => {
 	var sql = "";
 	var vals = [];
 	var result;
-	var html;
+	var obj = {};
 	switch (type) {
 		case "remove":
 			//http://127.0.0.1/api/remove?id=2&pw=11111111
@@ -181,16 +181,11 @@ app.post("/api/:type", (req, res) => {
 				(async () => {
 					result = await sqlExec(sql, vals);
 					html = `<meta charset="utf-8"><script>`;
-					if (result[0].affectedRows == 1) //res.redirect("/gbook/li/"+page+"?chk=remove");
-					{
-						html += 'alert("삭제되었습니다.");';
-						html += 'location.href = "/gbook/li/' + page + '"';
-					} else {
-						html += 'alert("패스워드가 올바르지 않습니다.");';
-						html += 'history.go(-1)';
-					}
-					html += `</script>`;
-					res.send(html);
+					if (result[0].affectedRows == 1) obj.msg =  "삭제되었습니다.";
+					//res.redirect("/gbook/li/"+page+"?chk=remove");
+					else obj.msg = "패스워드가 올바르지 않습니다.";
+						obj.loc = "/gbook/li/" + page ;
+					res.send(util.alertLocation(obj));
 					//이동하는 페이지(history)에서 이전페이지로 돌아가기
 					//res는 셋 중 하나만 동작함.
 					// res.json(result);-> 죽이지 않으면 또 result가 돌아서 오류남.
@@ -208,16 +203,10 @@ app.post("/api/:type", (req, res) => {
 				(async () => {
 					result = await sqlExec(sql, vals);
 					html = '<meta charset="utf-8"><script>';
-					if (result[0].affectedRows == 1) {
-						html += 'alert("수정되었습니다.");';
-						html += 'location.href = "/gbook/li/' + page + '";'
-					} 
-					else {
-						html += 'alert("패스워드가 올바르지 않습니다.");';
-						html += 'history.go(-1)';
-					}
-					html += '</script>';
-					res.send(html);
+					if (result[0].affectedRows == 1) 	obj.msg = "수정되었습니다.";
+					else obj.msg = "패스워드가 올바르지 않습니다.";
+						obj.loc = "/gbook/li/" + page ;
+					res.send(util.alertLocation(obj));
 					//	res.json(result);
 				})();
 			}
@@ -296,16 +285,16 @@ app.get("/gbook_ajax/:page", (req, res) => {
 // });
 
 //router 영역-POST
-app.post("/gbook_save", mt.upload.single("upfile") ,(req, res) => {
+app.post("/gbook_save", mt.upload.single("upfile"), (req, res) => {
 	//                                                req.fileValidateError = "Y"; 
 	const writer = req.body.writer;
 	const pw = req.body.pw;
 	const comment = req.body.comment;
-	var orifile;//실제파일
-	var savefile;//저장된 파일->multer에서 받음
-	if(req.file){//업로드가 안되면  undefined로 빈문서가 들어감.,화면에 글은 작성되지만 파일이 올라가지 않는다.
+	var orifile; //실제파일
+	var savefile; //저장된 파일->multer에서 받음
+	if (req.file) { //업로드가 안되면  undefined로 빈문서가 들어감.,화면에 글은 작성되지만 파일이 올라가지 않는다.
 		orifile = req.file.originalname;
-		savefile = req.file.filename; 
+		savefile = req.file.filename;
 	}
 	var result;
 
@@ -313,24 +302,24 @@ app.post("/gbook_save", mt.upload.single("upfile") ,(req, res) => {
 	//? 안에 들어갈 내용을 const data = await connect.query(sql, vals); 에서 받아서 실행해줌.
 	const vals = [comment, util.dspDate(new Date()), writer, pw, orifile, savefile];
 	(async () => {
-		result = await sqlExec(sql, vals);
-		//if(result[0].affectedRows > 0)res.redirect("gbook");
-		if(result[0].affectedRows > 0){
-			if(req.fileValidateError == "Y"){
-				html = '<meta charser="utf-8">';
-				html += '<script>';
-				html += 'alert("업로드가 허용되지 않는 파일이므로 파일은 업로드 되지 않습니다.");';
-				html += 'location.href="/gbook";';
-				html += '</script>';
-				res.send(html);
-			}
+			result = await sqlExec(sql, vals);
+			//if(result[0].affectedRows > 0)res.redirect("gbook");
+			if (result[0].affectedRows > 0) {
+				//	if(req.fileValidateError === false){
+				if (!req.fileValidateError) {
+					res.send(util.alertLocation({
+						msg: "허용되지 않는 파일형식 이므로 파일을 업로드 하지 않았습니다.첨부파일을 제외한 내용은 저장되었습니다.",
+						//\n은 소스자체가 enter가 되어서 오류가 남.
+						loc: "/gbook"
+					}));
+				} 
 			else res.redirect("/gbook");
 		}
 		else res.redirect("/500.html");
 	})();
 });
-	// ▲ async,await로 바꿈
-	//	sqlExec(sql, vals).then((data) => {
-	// 	console.log(data);
-	// 	res.redirect("/gbook");
-	// }).catch(sqlErr);
+// ▲ async,await로 바꿈
+//	sqlExec(sql, vals).then((data) => {
+// 	console.log(data);
+// 	res.redirect("/gbook");
+// }).catch(sqlErr);
