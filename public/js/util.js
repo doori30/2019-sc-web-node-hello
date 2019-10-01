@@ -151,3 +151,23 @@ function pagerMaker($pager, grpCnt, divCnt, total, page, cb) {
 	$(".page-item").css({"cursor":"pointer"});
 	$(".page-item").click(cb);
 }
+
+
+var imgExt = ["jpg", "jpeg", "png", "gif"];
+var fileExt = ["hwp", "xls", "xlsx", "ppt", "pptx", "doc", "docx", "txt", "zip", "pdf"];
+
+//함수표현식->함수로 변경(예전explorer가 안먹힐 수 있기때문)
+function splitName(file) {
+	var arr = file.split("."); //"a.b.jpg" -> ["a","b","jpg"] 나누기
+	var obj ={};
+	obj.ext = arr[1]//확장자
+	obj.name = arr[0]//0~89 +10 =99 확장자가 없는 이름
+	return obj;
+}
+
+function findPath(d) {
+	var year = String(d.getFullYear()).substr(2);
+	var month = d.getMonth() + 1;
+	if(month < 10) month = "0" + month;
+	return year + month;
+}

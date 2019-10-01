@@ -303,8 +303,9 @@ app.post("/gbook_save", mt.upload.single("upfile"), (req, res) => {
 			result = await sqlExec(sql, vals);
 			//if(result[0].affectedRows > 0)res.redirect("gbook");
 			if (result[0].affectedRows > 0) {
-				//	if(req.fileValidateError === false){
-				if (!req.fileValidateError) {
+			if(req.fileValidateError === false){
+			//if (!req.fileValidateError) {
+			//파일없이 올릴때 오류문제 해결하기 위해 원래대로 수정.
 					res.send(util.alertLocation({
 						msg: "허용되지 않는 파일형식 이므로 파일을 업로드 하지 않았습니다.첨부파일을 제외한 내용은 저장되었습니다.",
 						//\n은 소스자체가 enter가 되어서 오류가 남.
