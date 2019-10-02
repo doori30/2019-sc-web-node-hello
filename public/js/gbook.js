@@ -61,7 +61,7 @@ $("#gbook-tb td").not(":last-child").click(function () {
 				var ts = Number(file.name.split("-")[0]); //-로 분리하고 배열해서 0번째값이 타임스탬프
 				//var d = new Date(ts);//저장된 파일의 날짜.->폴더를 찾기 위해서....
 				var dir = findPath(new Date(ts));
-				var path = "/uploads/" + dir + "/" + res.savefile;//이미지 path
+				var imgPath = "/uploads/" + dir + "/" + res.savefile;//이미지 path
 				var downPath = "/download?fileName="+res.savefile+"&downName="+res.orifile;//파일path
 
 				if (fileExt.indexOf(ext) > -1) { //이미지로 찾으면 해커의 py가 안걸림.파일도 안걸림
@@ -72,7 +72,7 @@ $("#gbook-tb td").not(":last-child").click(function () {
 				} else { //파일은 abcpy가 실행되어버리면 해킹 될 수도 있기에 먼저 파일을 진행후 이미지를 작업하면 이미지는 이미지를 보여주기 위해 에러가 남. 보안을 해줄 수 있음.
 					//첨부이미지
 					$("#gbook-modal").find(".img-tr").removeClass("d-none");
-					$("#gbook-modal").find(".img-tr").find("img").attr("src", path);
+					$("#gbook-modal").find(".img-tr").find("img").attr("src", imgPath);
 				}
 			}
 
