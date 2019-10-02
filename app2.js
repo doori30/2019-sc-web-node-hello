@@ -9,6 +9,7 @@ app.listen(port, () => {
 //node_modules참조
 const bodyParser = require("body-parser") //get 방식.
 const path = require("path");
+const fs = require("fs");
 
 //modules참조
 const util = require("./modules/util"); // 내가만든 것 불러오기
@@ -169,22 +170,30 @@ app.post("/api/:type", (req, res) => {
 	var vals = [];
 	var result;
 	var obj = {};
+	var savefile = "";
 	switch (type) {
 		case "remove":
 			//http://127.0.0.1/api/remove?id=2&pw=11111111
 			if (id === undefined || pw === undefined) res.redirect("/500.html");
 			else {
-				sql = "DELETE FROM gbook WHERE id=? AND pw=?";
-				//WHERE을 꼭 붙여야 필요한 내용을 지울 수 있다. 아니면 전체를 지우게 됨.
 				vals.push(id);
 				vals.push(pw);
 				//push를 해서 배열에 채워줌.
 				(async () => {
-					result = await sqlExec(sql, vals);
-					if (result[0].affectedRows == 1) obj.msg =  "삭제되었습니다.";
-					//res.redirect("/gbook/li/"+page+"?chk=remove");
-					else obj.msg = "패스워드가 올바르지 않습니다.";
-						obj.loc = "/gbook/li/" + page ;
+					//첨부파일 가져오기
+					sql = "SELECT savefile FROM gbook WHERE id=" + id; //saveFile 필드의 id=?/id=id
+					result = await sqlExec(sql);
+					savefile = result[0][0].savefile;
+					//실제 데이터 베이스 삭제
+					sql = "DELETE FROM gbook WHERE id=? AND pw=?";
+					//WHERE을 꼭 붙여야 필요한 내용을 지울 수 있다. 아니면 전체를 지우게 됨.
+					result = await sqlExec(sql, vals); //삭제내용을 받으려면 삭제하기 전에 (async () => {result = await 를 추가로 더만들어줘야함.
+					if (result[0].affectedRows == 1) {
+						obj.msg = "삭제되었습니다.";
+						//res.redirect("/gbook/li/"+page+"?chk=remove");
+						if (util.nullChk(savefile)) fs.unlinkSync(path.join(__dirname, "/public/uploads/" + mt.getDir(savefile) + "/" + savefile));
+					} else obj.msg = "패스워드가 올바르지 않습니다.";
+					obj.loc = "/gbook/li/" + page;
 					res.send(util.alertLocation(obj));
 					//이동하는 페이지(history)에서 이전페이지로 돌아가기
 					//res는 셋 중 하나만 동작함.
@@ -202,9 +211,9 @@ app.post("/api/:type", (req, res) => {
 				vals.push(pw);
 				(async () => {
 					result = await sqlExec(sql, vals);
-					if (result[0].affectedRows == 1) 	obj.msg = "수정되었습니다.";
+					if (result[0].affectedRows == 1) obj.msg = "수정되었습니다.";
 					else obj.msg = "패스워드가 올바르지 않습니다.";
-						obj.loc = "/gbook/li/" + page ;
+					obj.loc = "/gbook/li/" + page;
 					res.send(util.alertLocation(obj));
 					//	res.json(result);
 				})();
@@ -217,10 +226,10 @@ app.post("/api/:type", (req, res) => {
 });
 
 //File download Router
-app.get("/download",(req, res) => { 
-	const fileName = req.query.fileName;//실제 저장 파일명(ex:ts-00.jpg)
-	const downName = req.query.downName;//업로드 파일명(ex:desert.jpg)
-	const filePath = path.join(__dirname , "/public/uploads/"+mt.getDir(fileName)+"/")+fileName;
+app.get("/download", (req, res) => {
+	const fileName = req.query.fileName; //실제 저장 파일명(ex:ts-00.jpg)
+	const downName = req.query.downName; //업로드 파일명(ex:desert.jpg)
+	const filePath = path.join(__dirname, "/public/uploads/" + mt.getDir(fileName) + "/") + fileName;
 	//const filePath = path.join(__dirname , "/public/uploads/"+mt.getDir(req.query.fileName)+"/")+req.query.fileName;
 	//                                                          ->multer에 getDir을 받음.
 	res.download(filePath, downName); //download()는 express가 가지고 있는 인자
@@ -311,21 +320,19 @@ app.post("/gbook_save", mt.upload.single("upfile"), (req, res) => {
 	//? 안에 들어갈 내용을 const data = await connect.query(sql, vals); 에서 받아서 실행해줌.
 	const vals = [comment, util.dspDate(new Date()), writer, pw, orifile, savefile];
 	(async () => {
-			result = await sqlExec(sql, vals);
-			//if(result[0].affectedRows > 0)res.redirect("gbook");
-			if (result[0].affectedRows > 0) {
-			if(req.fileValidateError === false){
-			//if (!req.fileValidateError) {
-			//파일없이 올릴때 오류문제 해결하기 위해 원래대로 수정.
-					res.send(util.alertLocation({
-						msg: "허용되지 않는 파일형식 이므로 파일을 업로드 하지 않았습니다.첨부파일을 제외한 내용은 저장되었습니다.",
-						//\n은 소스자체가 enter가 되어서 오류가 남.
-						loc: "/gbook"
-					}));
-				} 
-			else res.redirect("/gbook");
-		}
-		else res.redirect("/500.html");
+		result = await sqlExec(sql, vals);
+		//if(result[0].affectedRows > 0)res.redirect("gbook");
+		if (result[0].affectedRows > 0) {
+			if (req.fileValidateError === false) {
+				//if (!req.fileValidateError) {
+				//파일없이 올릴때 오류문제 해결하기 위해 원래대로 수정.
+				res.send(util.alertLocation({
+					msg: "허용되지 않는 파일형식 이므로 파일을 업로드 하지 않았습니다.첨부파일을 제외한 내용은 저장되었습니다.",
+					//\n은 소스자체가 enter가 되어서 오류가 남.
+					loc: "/gbook"
+				}));
+			} else res.redirect("/gbook");
+		} else res.redirect("/500.html");
 	})();
 });
 // ▲ async,await로 바꿈
