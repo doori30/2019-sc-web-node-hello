@@ -97,17 +97,22 @@ app.get(["/gbook", "/gbook/:type", "/gbook/:type/:id"], (req, res) => {
 				sql = "SELECT * FROM gbook ORDER BY id DESC limit ?,?";
 				sqlVal = [pagerVal.stRec, pagerVal.grpCnt];
 				result = await sqlExec(sql, sqlVal);
-				vals.datas = result[0];
+				vals.datas = result[0];//데이터 갯수 만큼의 데이터
+				//데이타스는 배열.
+				//datas=[
+				//	번호:이름:시간:내용:비고:] 그중에 아이콘을 추가 true면 아이콘 등록 typq에 따라 각 맞는 아이콘이 보임.
+				//     객체가 담기고 필요한 아이콘을 추가         
+				for(let item of vals.datas) item.useIcon = util.iconChk(item.wtime, item.savefile);
+				//                   객체안에 내용이 있다면 u=true/ new,jpg...
+				console.log(vals.datas);
 				vals.title = "방명록";
 				vals.pager = pagerVal;
 				for (let item of vals.datas) item.wtime = util.dspDate(new Date(item.wtime));
 				pug = "gbook";
 				res.render(pug, vals);
 			})(); //즉시실행
-
 			// var sql =
-			// 	sqlExec(sql).then((data) => {
-			// 		
+			// 	sqlExec(sql).then((data) => {	
 			// 		for (let item of data[0]) item.wtime = util.dspDate(new Date(item.wtime));
 			// 		res.render(pug, vals);
 			// 	}).catch(sqlErr);
@@ -192,7 +197,8 @@ app.post("/api/:type", (req, res) => {
 						obj.msg = "삭제되었습니다.";
 						//res.redirect("/gbook/li/"+page+"?chk=remove");
 						if (util.nullChk(savefile)) fs.unlinkSync(path.join(__dirname, "/public/uploads/" + mt.getDir(savefile) + "/" + savefile));
-					} else obj.msg = "패스워드가 올바르지 않습니다.";
+					}
+					else obj.msg = "패스워드가 올바르지 않습니다.";
 					obj.loc = "/gbook/li/" + page;
 					res.send(util.alertLocation(obj));
 					//이동하는 페이지(history)에서 이전페이지로 돌아가기
