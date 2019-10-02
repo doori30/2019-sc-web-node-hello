@@ -18,9 +18,12 @@
 							td.bg-dark.text-light.text-center 첨부이미지
 							td
 								img.w-100(style="max-width:300px;")
+								p
 						tr.file-tr.d-none
 							td.bg-dark.text-light.text-center 첨부파일
 							td
-								a(href="#")
+								a
+								//- a(href="#" download)
+								//- a(href=`/download?fileName=${fileName}&downName=${downName}`)
 			.modal-footer.justify-content-center
 				button#bt-close.btn.btn-primary(data-dismiss="modal") 닫기

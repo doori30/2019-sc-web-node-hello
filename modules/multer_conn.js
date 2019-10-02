@@ -15,6 +15,21 @@ const splitName = (file)=>{
 	return obj;
 }
 
+//const rename = (oldName, newName) => {
+	//fs.renameSync()//실제파일의 이름을 바꿔줌.->문제는 실제파일의 이름까지도 바뀌게됨.
+//}
+//파일명을 받아서 년월(ex:1909) 폴더명으로 리턴
+//module.exports.getDir=(fileName)=>{} ☞ exports를 하단에서 일일히 하지 않아도 되는 장점이 있다.
+const getDir = (fileName) => {
+	//23142342341-34.jpg 전달받은 파일네임을 -를 기준으로 두개의배열로 만들어서 0번째 타임스탬프를 뉴데이터에 담는다.
+	var d = new Date(Number(fileName.split("-")[0]));
+	var year = String(d.getFullYear()).substr(2);
+	var month = d.getMonth() + 1;
+	if(month < 10) month = "0" + month;
+	return year + month;
+}
+
+
 //업로드 가능한 확장자
 const imgExt = ["jpg", "jpeg", "png", "gif"];
 const fileExt = ["hwp", "xls", "xlsx", "ppt", "pptx", "doc", "docx", "txt", "zip", "pdf"];
@@ -85,6 +100,7 @@ module.exports = {
 	multer,
 	chkExt,
 	imgExt,
-	fileExt
+	fileExt,
+	getDir
 }
 //모듈에 보내줌

@@ -8,6 +8,7 @@ app.listen(port, () => {
 
 //node_modules참조
 const bodyParser = require("body-parser") //get 방식.
+const path = require("path");
 
 //modules참조
 const util = require("./modules/util"); // 내가만든 것 불러오기
@@ -215,7 +216,17 @@ app.post("/api/:type", (req, res) => {
 	}
 });
 
-
+//File download Router
+app.get("/download",(req, res) => { 
+	const fileName = req.query.fileName;//실제 저장 파일명(ex:ts-00.jpg)
+	const downName = req.query.downName;//업로드 파일명(ex:desert.jpg)
+	const filePath = path.join(__dirname , "/public/uploads/"+mt.getDir(fileName)+"/")+fileName;
+	//const filePath = path.join(__dirname , "/public/uploads/"+mt.getDir(req.query.fileName)+"/")+req.query.fileName;
+	//                                                          ->multer에 getDir을 받음.
+	res.download(filePath, downName); //download()는 express가 가지고 있는 인자
+	//                    "원하는 이름"쓰면 저장이름이 ""로 나옴/ 수정전에 다운로드하면 앞전에 받은 이름으로 다운이된다.
+	//다르게 될 경우 크기가 바뀌거나 캐시를 지워야함.
+});
 
 //방명록을 Ajax구현
 //방명록을 Ajax 통신으로 데이터만 보내주는 방식
