@@ -96,12 +96,12 @@ app.get(["/gbook", "/gbook/:type", "/gbook/:type/:id"], (req, res) => {
 				sql = "SELECT * FROM gbook ORDER BY id DESC limit ?,?";
 				sqlVal = [pagerVal.stRec, pagerVal.grpCnt];
 				result = await sqlExec(sql, sqlVal);
-				vals.datas = result[0];//데이터 갯수 만큼의 데이터
+				vals.datas = result[0]; //데이터 갯수 만큼의 데이터
 				//데이타스는 배열.
 				//datas=[
 				//	번호:이름:시간:내용:비고:] 그중에 아이콘을 추가 true면 아이콘 등록 typq에 따라 각 맞는 아이콘이 보임.
 				//     객체가 담기고 필요한 아이콘을 추가         
-				for(let item of vals.datas) item.useIcon = util.iconChk(item.wtime, item.savefile);
+				for (let item of vals.datas) item.useIcon = util.iconChk(item.wtime, item.savefile);
 				//                   객체안에 내용이 있다면 u=true/ new,jpg...
 				console.log(vals.datas);
 				vals.title = "방명록";
@@ -163,7 +163,7 @@ app.get("/api/:type", (req, res) => {
 	}
 });
 
-app.post("/api/:type", (req, res) => {
+app.post("/api/:type", mt.upload.single("upfile"), (req, res) => {
 	var type = req.params.type;
 	var id = req.body.id;
 	var pw = req.body.pw;
@@ -174,7 +174,13 @@ app.post("/api/:type", (req, res) => {
 	var vals = [];
 	var result;
 	var obj = {};
-	var savefile = "";
+	var orifile; //실제파일
+	var savefile; //저장된 파일->multer에서 받음
+	var oldfile;
+	if (req.file) { //업로드가 안되면  undefined로 빈문서가 들어감.,화면에 글은 작성되지만 파일이 올라가지 않는다.
+		orifile = req.file.originalname;
+		savefile = req.file.filename;
+	}
 	switch (type) {
 		case "remove":
 			//http://127.0.0.1/api/remove?id=2&pw=11111111
@@ -196,7 +202,7 @@ app.post("/api/:type", (req, res) => {
 						obj.msg = "삭제되었습니다.";
 						//res.redirect("/gbook/li/"+page+"?chk=remove");
 						if (util.nullChk(savefile)) fs.unlinkSync(path.join(__dirname, "/public/uploads/" + mt.getDir(savefile) + "/" + savefile));
-					}
+					} //첨부파일이있으면 unlinkSybc를 함.
 					else obj.msg = "패스워드가 올바르지 않습니다.";
 					obj.loc = "/gbook/li/" + page;
 					res.send(util.alertLocation(obj));
@@ -209,15 +215,29 @@ app.post("/api/:type", (req, res) => {
 		case "update":
 			if (id === undefined || pw === undefined) res.redirect("/500.html");
 			else {
-				sql = "UPDATE gbook SET writer=?, comment=? WHERE id=? AND pw=?";
-				vals.push(writer);
-				vals.push(comment);
-				vals.push(id);
-				vals.push(pw);
+				//sql = "UPDATE gbook SET writer=?, comment=? WHERE id=? AND pw=?";
+				//기존파일이 있으면 앞전거 삭제하고 올려줌,없으면 새로올림
+				vals.push(writer); //0 /if=x 0
+				vals.push(comment); //1 /1
+				if (req.file) vals.push(orifile); //2 /x
+				if (req.file) vals.push(savefile); //3 /x
+				vals.push(id); //4 /2
+				vals.push(pw); //5 /3
 				(async () => {
+					//첨부파일 가져오기
+					sql = "SELECT savefile FROM gbook WHERE id=" + id; //saveFile 필드의 id=?/id=id
+					result = await sqlExec(sql);
+					oldfile = result[0][0].savefile;
+					//실제데이터 수정
+					sql = "UPDATE gbook SET writer=?, comment=? ";
+					if (req.file) sql += ", orifile=?, savefile=? "; //req.file존재한다면 진행
+					sql += " WHERE id=? AND pw=?"
 					result = await sqlExec(sql, vals);
-					if (result[0].affectedRows == 1) obj.msg = "수정되었습니다.";
-					else obj.msg = "패스워드가 올바르지 않습니다.";
+					if (result[0].affectedRows == 1) {
+						obj.msg = "수정되었습니다.";
+						//기존파일 삭제하기
+						if (req.file && util.nullChk(oldfile)) fs.unlinkSync(path.join(__dirname, "/public/uploads/" + mt.getDir(oldfile) + "/" + oldfile)); //올린파일과 기존파일이 존재하면 true ->기존파일을 삭제
+					} else obj.msg = "패스워드가 올바르지 않습니다.";
 					obj.loc = "/gbook/li/" + page;
 					res.send(util.alertLocation(obj));
 					//	res.json(result);
