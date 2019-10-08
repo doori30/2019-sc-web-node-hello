@@ -163,3 +163,33 @@ function upAjax(id) {
 
 //if($(f).find("input[name=''writer]").val().trim();) <-jQuery
 //if(f.writer.value.trim()) <-javascript
+
+// POPUP
+function popOpen () {
+setTimeout(function() {//지정시간 뒤 내용을 실행. display:none이면 css자체도 적용을 안시키는 거 같다..(무시)
+	$(".popup-bg").css("display","flex"); //두가지를 같이 진행시키면 위에거가 시작할때 같이 시작되면서 결과에 translate가 안먹힌다.
+	setTimeout(function() {//그래서 setTimeout을 두번돌려서 위에 작업 후에 진행이 된다.
+		$(".popup-wrap").css({"opacity": 1, "transform":"translateY(0)"});
+	},100);
+}, 500);
+}
+
+$.removeCookie("popChk");
+
+console.log($.cookie("popChk"));
+if($.cookie("popChk") !== "true") popOpen();
+//popChk가 문자열 true가 아닌경우 popOpen실행
+//true면 지워지는거.
+
+$(".popup-close, .popup-close2").click(function(){
+	//attribute - 마음대로 값을 바꿀 수 있는 속성
+	//property - 정해져 있는 속성
+	//<input type="text" checked>
+	//         ->attr    prop
+	//$.cookie("변수명","변수값",{expires(cookie가 만료되는 시점):1(하루)});
+	var chk = $("#popOut").prop("checked");
+	console.log(chk);
+	$.cookie("popChk",chk,{expires:1});//쿠키생성- true일때 보이지 않음.
+	$(".popup-bg").css("display","none");
+	$(".popup-wrap").css({"opacity": 0, "transform":"translateY(-220)"});
+});
