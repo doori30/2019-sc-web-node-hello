@@ -1,7 +1,10 @@
 //아이디 중복 체크
 $("#userid").on("blur",function(){
-	var userid = $(this).val();
-	if(userid.length >= 6 && userid.length <= 16){ 
+	var userid = $(this).val().trim();
+	//console.log(userid.indexOf(" "));
+	var idType = /^[A-Za-z0-9+]{6,16}$/;  //아이디 정규표현식 글자는 6~16자 
+//	if(userid.length >= 6 && userid.length <= 16 && userid.indexOf(' ') < 0){ 
+	if(idType.test(userid)){ //정규표현식이 가지고 있는 method
 	ajax("/api-mem/userid", "post", {userid: userid}, function(res){
 		//	console.log(res);
 		$(".userid-cmt").empty();
@@ -19,7 +22,7 @@ $("#userid").on("blur",function(){
 	});
 }
 else {
-	$(".userid-cmt").text("* 아이디는 6 ~ 16자 입니다.");
+	$(".userid-cmt").text("* 아이디는 영문, 숫자 6 ~ 16자 입니다.(띄어쓰기X)");
 	$(".userid-cmt").css({"color": "red"});
 		$("#userid").css({"border": "1px solid red"});
 		$("#userid").focus();
