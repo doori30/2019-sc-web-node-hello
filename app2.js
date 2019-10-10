@@ -370,20 +370,40 @@ app.post("/gbook_save", mt.upload.single("upfile"), (req, res) => {
 /* 회원가입 및 로그인 등 */
 /* 회원 라우터 */
 // 회원가입, 아이디/비밀번호 찾기, 회원리스트, 회원정보
-app.get("/men/:type",menEdit);
-
+app.get("/mem/:type",memEdit);
+app.post("/api-mem/:type", memApi); //회원가입시 각종mAjax
 
 /* 함수구현 - GET */
-//const menEdit = (req,res) => {//실행과 동시에 위에app.get을 실행하는데 함수표현식이여서 찾을수 없음.->함수 선언문으로 바꿔서 쓸 것.
-function menEdit(req,res){
+//const memEdit = (req,res) => {//실행과 동시에 위에app.get을 실행하는데 함수표현식이여서 찾을수 없음.->함수 선언문으로 바꿔서 쓸 것.
+function memEdit(req,res){
 	const type = req.params.type;
-	const vals = {css:"men", js:"men"};
+	const vals = {css:"mem", js:"mem"};
 
 	switch(type) {
 		case "join":
 			vals.title = "회원가입";
 			vals.tel = util.telNum;
-			res.render("men_in",vals);
+			res.render("mem_in",vals);
+			break;
+	}
+}
+/* 함수 구현 - POST */
+function memApi(req,res) {
+	const type = req.params.type;
+	var sql = "";
+	var sqlVals = [];
+	var result ;
+	switch(type) {
+		case "userid":
+			const userid = req.body.userid;
+			(async ()=>{
+				sql = "SELECT count(id) FROM member WHERE userid=?";
+				sqlVals.push(userid);
+				result = await sqlExec(sql, sqlVals);
+				//res.json(result[0][0]["count(id)"]);
+				if(result[0][0]["count(id)"] > 0) res.json({chk: false}); // 유저 아이디가 존재한다면
+				else res.json({chk:true});
+			})();
 			break;
 	}
 }

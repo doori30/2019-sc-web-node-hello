@@ -8,7 +8,7 @@ html(lang="ko")
 		.container.my-3
 			.jumbotron
 				h2= `${title}`
-			form(name="memberJoin" method="post" action="/men/join" onsubmit="return memberJoin()")
+			form(name="memberJoin" method="post" action="/mem/join" onsubmit="return memberJoin()")
 				table.table.table-bordered
 					colgroup
 						col(width="20%")
@@ -16,8 +16,9 @@ html(lang="ko")
 					tbody
 						tr
 							td.bg-dark.text-light 아이디
-								td
-									input.form-control(type="text" name="userid" id="userid" placeholder="아이디" style="max-width: 200px;")
+								td.form-inline
+									input.form-control.mr-3(type="text" name="userid" id="userid" placeholder="아이디" style="max-width: 200px;")
+									span.userid-cmt
 						tr
 							td.bg-dark.text-light 패스워드
 								td
