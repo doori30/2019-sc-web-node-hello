@@ -90,10 +90,13 @@ const iconChk = (dt, file) => {//사용자가 파일을 안던지면 null이됨(
 // 	return obj;//파일일 없으면 빈객체로 진행
 // }//단점: 신규로 글을 등록시 파일이 없으면 NEW가 뜨지 않음.타임스탬프를 못가져옴.
 
+const telNum =["010","011","016","017","018","019","02","031","032","033","041","042","051","052","053","054","055","061","062","063","064"];
+
 module.exports = {
 	dspDate,
 	alertLocation,
 	zp,
 	nullChk,
-	iconChk
+	iconChk,
+	telNum
 }

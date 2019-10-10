@@ -365,3 +365,24 @@ app.post("/gbook_save", mt.upload.single("upfile"), (req, res) => {
 // 	console.log(data);
 // 	res.redirect("/gbook");
 // }).catch(sqlErr);
+
+
+/* 회원가입 및 로그인 등 */
+/* 회원 라우터 */
+// 회원가입, 아이디/비밀번호 찾기, 회원리스트, 회원정보
+app.get("/men/:type",menEdit);
+
+
+/* 함수구현 - GET */
+//const menEdit = (req,res) => {//실행과 동시에 위에app.get을 실행하는데 함수표현식이여서 찾을수 없음.->함수 선언문으로 바꿔서 쓸 것.
+function menEdit(req,res){
+	const type = req.params.type;
+	const vals = {};
+
+	switch(type) {
+		case "join":
+			vals.title = "회원가입";
+			res.render("men_in",vals);
+			break;
+	}
+}
