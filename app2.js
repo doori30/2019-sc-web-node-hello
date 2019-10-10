@@ -371,7 +371,9 @@ app.post("/gbook_save", mt.upload.single("upfile"), (req, res) => {
 /* 회원 라우터 */
 // 회원가입, 아이디/비밀번호 찾기, 회원리스트, 회원정보
 app.get("/mem/:type",memEdit);
-app.post("/api-mem/:type", memApi); //회원가입시 각종mAjax
+app.post("/api-mem/:type", memApi); //회원가입시 각종Ajax
+app.post("/mem/join", memJoin); //회원가입 저장
+
 
 /* 함수구현 - GET */
 //const memEdit = (req,res) => {//실행과 동시에 위에app.get을 실행하는데 함수표현식이여서 찾을수 없음.->함수 선언문으로 바꿔서 쓸 것.
@@ -406,4 +408,25 @@ function memApi(req,res) {
 			})();
 			break;
 	}
+}
+
+//회원가입 저장
+function memJoin(req, res) {
+	const vals = [];
+	vals.push(req.body.userid);
+	vals.push(req.body.userpw);
+	vals.push(req.body.username);
+	vals.push(req.body.tel1 + "-" + req.body.tel2 + "-" + req.body.tel3);
+	vals.push(req.body.post);
+	vals.push(req.body.addr1 + req.body.addr2);
+	vals.push(req.body.addr3);
+	vals.push(new Date());
+	vals.push(2);
+	var sql = "";
+	var result = {};
+	(async () => {
+		sql = "INSERT INTO member SET userid=?, userpw=?, username=?, tel=?, post=?, addr1=?, addr2=?, wtime=?, grade=?";
+		result = await sqlExec(sql, vals);
+		res.send(result);
+	})();
 }

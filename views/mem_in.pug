@@ -8,7 +8,7 @@ html(lang="ko")
 		.container.my-3
 			.jumbotron
 				h2= `${title}`
-			form(name="memberJoin" method="post" action="/mem/join" onsubmit="return memberJoin()")
+			form(name="memberForm" method="post" action="/mem/join" onsubmit="return memberJoin(this);")
 				table.table.table-bordered
 					colgroup
 						col(width="20%")
@@ -17,7 +17,7 @@ html(lang="ko")
 						tr
 							td.bg-dark.text-light 아이디
 								td.form-inline
-									input.form-control.mr-3(type="text" name="userid" id="userid" placeholder="아이디" style="max-width: 200px;")
+									input.form-control.mr-3(type="text" name="userid" id="userid" placeholder="아이디" style="max-width: 200px;" data-use="F")
 									span.userid-cmt
 						tr
 							td.bg-dark.text-light 패스워드
@@ -36,7 +36,7 @@ html(lang="ko")
 						tr
 							td.bg-dark.text-light 전화번호
 								td.form-inline
-									select.form-control(name="tell1" id="tell1"  style="max-width: 150px;")
+									select.form-control(name="tel1" id="tel1"  style="max-width: 150px;")
 										option(value="" selected) 선택
 										each item in tel
 												option(value=item)=item
