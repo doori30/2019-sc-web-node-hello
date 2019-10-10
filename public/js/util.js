@@ -171,3 +171,10 @@ function findPath(d) {
 	if(month < 10) month = "0" + month;
 	return year + month;
 }
+
+function telChk(obj){//전화번호의 obj를 받아서 4자리보다 크면 obj.value를 다음과 같이 바꿔줄것.
+	if (String(obj.value).length > 4){
+			obj.value = obj.value.slice(0, 4);
+	}
+}
+
