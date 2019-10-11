@@ -440,11 +440,12 @@ function memApi(req,res) {
 //회원가입 저장
 function memJoin(req, res) {
 	const vals = [];
-	const mysql = db.mysql;
 	//const salt = "My Password Key"//비밀번호 보안을 위해 양념을 침.(위에 전역변수로 선언함.)
 	var userpw = crypto.createHash("sha512").update(req.body.userpw + salt).digest("base64");
 	//암호화 기법중 512기법을 씀. 그리고 양념을 친 비밀번호를 업데이트 함. 마지막에 데이터 베이스에 저장함.
 	vals.push(req.body.userid);
+	// var userid = req.body.userid;
+	// vals.push(userid);
 	vals.push(userpw);
 	vals.push(req.body.username);
 	vals.push(req.body.tel1 + "-" + req.body.tel2 + "-" + req.body.tel3);
@@ -472,7 +473,7 @@ function memLogin(req,res){
 	var result;
 	var sql = "";
 	var vals = [];
-	userpw = crypto.createHash("sha512").update(userpw + salt).digest("base64");
+	userpw = crypto.createHash("sha512").update(userpw + salt).digest("base64"); //고정이된단다....옴[...]
 	(async () => {
 		sql = "SELECT count(id) FROM member WHERE userid=? AND userpw=?" //아이디와 패스워드가 일치하는 카운트 아이디를 찾을 것.
 		vals.push(userid);
