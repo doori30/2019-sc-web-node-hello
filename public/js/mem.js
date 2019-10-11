@@ -69,3 +69,17 @@ function memberJoin(f){
 	}
 	return true;
 }
+
+function memberLogin(f){
+	if($("#loginid").val().trim() == "") {
+		alert("아이디를 입력해 주세요.")
+		$("loginid").focus();
+		return false;
+	}
+	if($("#loginpw").val().trim() == "") {
+		alert("패스워드를 입력해 주세요.")
+		$("loginpw").focus();
+		return false;
+	}
+	return true;
+}

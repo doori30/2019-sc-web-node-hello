@@ -10,6 +10,8 @@ app.listen(port, () => {
 const bodyParser = require("body-parser") //get 방식.
 const path = require("path");
 const fs = require("fs");
+const session = require("express-session");
+const store = require("session-file-store")(session);//세션모듈전체를 인자로 잡아서 모듈을 던저서 스토어를 만듦
 
 //modules참조
 const util = require("./modules/util"); // 내가만든 것 불러오기
@@ -23,11 +25,18 @@ const sqlPool = db.sqlPool;
 const sqlExec = db.sqlExec;
 const sqlErr = db.sqlErr;
 const mysql = db.mysql;
+const salt = "My Password Key"//비밀번호 보안을 위해 양념을 침.
 
 //app초기화
 app.use("/", express.static("./public"));
 app.use(bodyParser.urlencoded({
 	extended: true
+}));
+app.use(session({//세션초기화 
+	secret : salt, //암호화
+	resave : false,
+	saveUninitialized : true, //save할 때 초기화를 하지않음.
+	store : new store()
 }));
 app.set("view engine", "pug");
 app.set("views", "./views");
@@ -421,7 +430,8 @@ function memApi(req,res) {
 //회원가입 저장
 function memJoin(req, res) {
 	const vals = [];
-	const salt = "My Password Key"//비밀번호 보안을 위해 양념을 침.
+	const mysql = db.mysql;
+	//const salt = "My Password Key"//비밀번호 보안을 위해 양념을 침.(위에 전역변수로 선언함.)
 	var userpw = crypto.createHash("sha512").update(req.body.userpw + salt).digest("base64");
 	//암호화 기법중 512기법을 씀. 그리고 양념을 친 비밀번호를 업데이트 함. 마지막에 데이터 베이스에 저장함.
 	vals.push(req.body.userid);
@@ -444,5 +454,23 @@ function memJoin(req, res) {
 
 /* 로그인 처리 모듈 */
 function memLogin(req,res){
-	
+	var userid =	req.body.loginid;
+	var userpw =	req.body.loginpw;
+	var result;
+	var sql = "";
+	var vals = [];
+	userpw = crypto.createHash("sha512").update(userpw + salt).digest("base64");
+	(async () => {
+		sql = "SELECT count(id) FROM member WHERE userid=? AND userpw=?" //아이디와 패스워드가 일치하는 카운트 아이디를 찾을 것.
+		vals.push(userid);
+		vals.push(userpw);
+		result = await sqlExec(sql, vals);
+		if(result[0][0]["count(id)"] == 1) {
+			req.session.userid = userid;
+			res.json({code: 200});
+		}
+		else{
+			res.json({code: 400});
+		}
+	})();
 }
