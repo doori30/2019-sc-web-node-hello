@@ -26,6 +26,7 @@ const sqlExec = db.sqlExec;
 const sqlErr = db.sqlErr;
 const mysql = db.mysql;
 const salt = "My Password Key"//비밀번호 보안을 위해 양념을 침.
+var loginId;
 
 //app초기화
 app.use("/", express.static("./public"));
@@ -54,7 +55,8 @@ app.get(["/page", "/page/:page"], (req, res) => {
 		page,
 		title,
 		css,
-		js
+		js,
+		loginId
 	};
 	res.render("page", vals); //page.pug파일에 vals({page, title, css, js})라는 변수를 담아서 보냄.
 });
@@ -67,6 +69,8 @@ type: /up/1(id) - 선택된 방명록 수정
 type: /rm/1(id) - 선택된 방명록 삭제
 */
 app.get(["/gbook", "/gbook/:type", "/gbook/:type/:id"], (req, res) => {
+	loginId = req.session.userid;
+	//로그인시 저장된 유저 아이디 , 로그인을 하지 않을 경우 undefiend가 저장됨. login(o): userid, login(x):undefiend
 	var type = req.params.type;
 	var id = req.params.id;
 	if (type === undefined) type = "li"
@@ -79,7 +83,8 @@ app.get(["/gbook", "/gbook/:type", "/gbook/:type/:id"], (req, res) => {
 	var sqlVal;
 	var vals = {
 		css: "gbook",
-		js: "gbook"
+		js: "gbook",
+		loginId
 	}
 	switch (type) {
 		case "in":
@@ -276,13 +281,15 @@ app.get("/download", (req, res) => {
 //방명록을 Ajax 통신으로 데이터만 보내주는 방식
 //디자인준비.
 app.get("/gbook_ajax", (req, res) => {
+	loginId = req.session.userid;
 	const title = "방명록-Ajax";
 	const css = "gbook_ajax"
 	const js = "gbook_ajax"
 	const vals = {
 		title,
 		css,
-		js
+		js,
+		loginId
 	};
 	res.render("gbook_ajax", vals); //pug
 });
@@ -388,8 +395,9 @@ app.post("/mem/login", memLogin); //회원 로그인 모듈
 /* 함수구현 - GET */
 //const memEdit = (req,res) => {//실행과 동시에 위에app.get을 실행하는데 함수표현식이여서 찾을수 없음.->함수 선언문으로 바꿔서 쓸 것.
 function memEdit(req,res){
+	loginId = req.session.userid;
 	const type = req.params.type;
-	const vals = {css:"mem", js:"mem"};
+	const vals = {css:"mem", js:"mem", loginId}; //pug전달.
 
 	switch(type) {
 		case "join":
@@ -467,10 +475,14 @@ function memLogin(req,res){
 		result = await sqlExec(sql, vals);
 		if(result[0][0]["count(id)"] == 1) {
 			req.session.userid = userid;
-			res.json({code: 200});
+			res.redirect("/");
 		}
 		else{
-			res.json({code: 400});
+			req.session.destory();
+			res.send(util.alertLocation({
+				msg: "아이디와 패스워드가 틀렸습니다.",
+				loc: "/mem/login"
+			}));
 		}
 	})();
 }
