@@ -174,7 +174,7 @@ setTimeout(function() {//지정시간 뒤 내용을 실행. display:none이면 c
 }, 500);
 }
 
-$.removeCookie("popChk");
+//$.removeCookie("popChk"); => 팝업창을 꺼도 다시 새로고침할 때 나타남
 
 console.log($.cookie("popChk"));
 if($.cookie("popChk") !== "true") popOpen();

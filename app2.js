@@ -386,7 +386,7 @@ app.post("/gbook_save", mt.upload.single("upfile"), (req, res) => {
 
 /* 회원가입 및 로그인 등 */
 /* 회원 라우터 */
-app.get("/mem/:type",memEdit);// 회원가입, 아이디/비밀번호 찾기, 회원리스트, 회원정보,로그인
+app.get("/mem/:type",memEdit);// 회원가입, 아이디/비밀번호 찾기, 리스트, 정보, 로그인, 로그아웃
 app.post("/api-mem/:type", memApi); //회원가입시 각종Ajax
 app.post("/mem/join", memJoin); //회원가입 저장
 app.post("/mem/login", memLogin); //회원 로그인 모듈
@@ -405,11 +405,13 @@ function memEdit(req,res){
 			vals.tel = util.telNum;
 			res.render("mem_in",vals);
 			break;
-	}
-	switch(type) {
 		case "login":
 			vals.title = "회원로그인";
 			res.render("mem_login",vals);
+			break;
+		case "logout":
+			req.session.destroy();
+			res.redirect("/");
 			break;
 	}
 }
@@ -456,7 +458,10 @@ function memJoin(req, res) {
 	(async () => {
 		sql = "INSERT INTO member SET userid=?, userpw=?, username=?, tel=?, post=?, addr1=?, addr2=?, wtime=?, grade=?";
 		result = await sqlExec(sql, vals);
-		res.send(result);
+		res.send(util.alertLocation({
+			msg: "회원으로 가입되었습니다.",
+			loc: "/mem/login"
+		}));
 	})();
 }
 
@@ -478,7 +483,7 @@ function memLogin(req,res){
 			res.redirect("/");
 		}
 		else{
-			req.session.destory();
+			req.session.destroy();
 			res.send(util.alertLocation({
 				msg: "아이디와 패스워드가 틀렸습니다.",
 				loc: "/mem/login"
