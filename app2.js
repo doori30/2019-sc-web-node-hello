@@ -16,6 +16,7 @@ const util = require("./modules/util"); // 내가만든 것 불러오기
 const db = require("./modules/mysql_conn"); // 내가만든 것 불러오기
 const pager = require("./modules/pager"); //요청들어오면 처리해줌.
 const mt = require("./modules/multer_conn");
+const crypto = require("crypto"); //보안(암호)
 
 //전역변수 선언
 const sqlPool = db.sqlPool;
@@ -369,10 +370,10 @@ app.post("/gbook_save", mt.upload.single("upfile"), (req, res) => {
 
 /* 회원가입 및 로그인 등 */
 /* 회원 라우터 */
-// 회원가입, 아이디/비밀번호 찾기, 회원리스트, 회원정보
-app.get("/mem/:type",memEdit);
+app.get("/mem/:type",memEdit);// 회원가입, 아이디/비밀번호 찾기, 회원리스트, 회원정보,로그인
 app.post("/api-mem/:type", memApi); //회원가입시 각종Ajax
 app.post("/mem/join", memJoin); //회원가입 저장
+app.post("/mem/login", memLogin); //회원 로그인 모듈
 
 
 /* 함수구현 - GET */
@@ -388,7 +389,14 @@ function memEdit(req,res){
 			res.render("mem_in",vals);
 			break;
 	}
+	switch(type) {
+		case "login":
+			vals.title = "회원로그인";
+			res.render("mem_login",vals);
+			break;
+	}
 }
+
 /* 함수 구현 - POST */
 function memApi(req,res) {
 	const type = req.params.type;
@@ -413,8 +421,11 @@ function memApi(req,res) {
 //회원가입 저장
 function memJoin(req, res) {
 	const vals = [];
+	const salt = "My Password Key"//비밀번호 보안을 위해 양념을 침.
+	var userpw = crypto.createHash("sha512").update(req.body.userpw + salt).digest("base64");
+	//암호화 기법중 512기법을 씀. 그리고 양념을 친 비밀번호를 업데이트 함. 마지막에 데이터 베이스에 저장함.
 	vals.push(req.body.userid);
-	vals.push(req.body.userpw);
+	vals.push(userpw);
 	vals.push(req.body.username);
 	vals.push(req.body.tel1 + "-" + req.body.tel2 + "-" + req.body.tel3);
 	vals.push(req.body.post);
@@ -429,4 +440,9 @@ function memJoin(req, res) {
 		result = await sqlExec(sql, vals);
 		res.send(result);
 	})();
+}
+
+/* 로그인 처리 모듈 */
+function memLogin(req,res){
+	
 }
