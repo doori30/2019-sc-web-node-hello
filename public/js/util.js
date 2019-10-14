@@ -149,8 +149,13 @@ function pagerMaker($pager, grpCnt, divCnt, total, page, cb) {
 	html += '</li>';
 	$pager.html(html);
 	$(".page-item").css({"cursor":"pointer"});
-	$(".page-item").click(cb);
+	$(".page-item").click(cb); //gbook_ajax방명록에서 사용함. 매번 사용 할 때마다 실행됨.
 }
+	$(".page-item").click(function () {
+		var n = $(this).data("page");
+		if (n !== undefined) location.href = $(".pager").data("pager-name") + n;
+																									// /gbook/li, /mem/list를 보여줄 때
+	});//ajax제외 나머지에서 사용
 
 
 var imgExt = ["jpg", "jpeg", "png", "gif"];

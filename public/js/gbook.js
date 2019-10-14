@@ -34,10 +34,10 @@ function onRev(f) {
 	return true;
 }
 
-$(".page-item").click(function () {
-	var n = $(this).data("page");
-	if (n !== undefined) location.href = "/gbook/li/" + n;
-});
+// $(".page-item").click(function () {
+// 	var n = $(this).data("page");
+// 	if (n !== undefined) location.href = "/gbook/li/" + n;
+// });
 
 //상세내용보기 - modal POPUP
 $("#gbook-tb td").not(":last-child").click(function () {

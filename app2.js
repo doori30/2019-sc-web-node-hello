@@ -75,8 +75,10 @@ app.get(["/gbook", "/gbook/:type", "/gbook/:type/:id"], (req, res) => {
 	var type = req.params.type;
 	var id = req.params.id;
 	if (type === undefined) type = "li"
-	if (type === "li" && id === undefined) id = "1"
-	if (id === undefined && type !== "in") res.redirect("/404.html");
+	//if (type === "li" && id === undefined) id = "1"
+	if (type === "li" && !util.nullChk(id)) id = "1"
+	//if (id === undefined && type !== "in") res.redirect("/404.html");
+	if (!util.nullChk(id)  && type !== "in") res.redirect("/404.html");
 	// res.send(type + "/" + id);
 	var pug;
 	var sql;
@@ -98,16 +100,17 @@ app.get(["/gbook", "/gbook/:type", "/gbook/:type/:id"], (req, res) => {
 				var totCnt = 0;
 				var page = id;
 				var divCnt = 3;
-				var grpCnt = req.query.grpCnt;
-				if (grpCnt === undefined || typeof grpCnt !== "number") grpCnt = 5;
+				var grpCnt = 5;
+				//var grpCnt = Number(req.query.grpCnt);
+				//if (grpCnt === undefined || typeof grpCnt !== "number") grpCnt = 5;
+				//if (!util.nullChk(grpCnt)) grpCnt = 5;
 				sql = "SELECT count(id) FROM gbook";
 				result = await sqlExec(sql);
 				totCnt = result[0][0]["count(id)"];
 				const pagerVal = pager.pagerMaker({
 					totCnt,
-					grpCnt,
-					divCnt,
-					page
+					page,
+					grpCnt
 				}); //pager.js에서 obj객체로 만들어서  여기서 요청을 하면 예외처리에서 먼저 확인을 거쳐서 작업을 진행. 
 				sql = "SELECT * FROM gbook ORDER BY id DESC limit ?,?";
 				sqlVal = [pagerVal.stRec, pagerVal.grpCnt];
@@ -122,6 +125,7 @@ app.get(["/gbook", "/gbook/:type", "/gbook/:type/:id"], (req, res) => {
 				console.log(vals.datas);
 				vals.title = "방명록";
 				vals.pager = pagerVal;
+				pagerVal.link="/gbook/li/";
 				for (let item of vals.datas) item.wtime = util.dspDate(new Date(item.wtime));
 				pug = "gbook";
 				res.render(pug, vals);
@@ -387,7 +391,7 @@ app.post("/gbook_save", mt.upload.single("upfile"), (req, res) => {
 
 /* 회원가입 및 로그인 등 */
 /* 회원 라우터 */
-app.get("/mem/:type",memEdit);// 회원가입, 아이디/비밀번호 찾기, 리스트, 정보, 로그인, 로그아웃
+app.get(["/mem/:type","/mem/:type/:id"],memEdit);// 회원가입, 아이디/비밀번호 찾기, 리스트, 정보, 로그인, 로그아웃
 app.post("/api-mem/:type", memApi); //회원가입시 각종Ajax
 app.post("/mem/join", memJoin); //회원가입 저장
 app.post("/mem/login", memLogin); //회원 로그인 모듈
@@ -416,11 +420,22 @@ function memEdit(req,res){
 			res.redirect("/");
 			break;
 		case "list":
+			var totCnt = 0;
+			var page = req.params.id;
+			var divCnt = 3;
+			var grpCnt = 3;
+			if(!util.nullChk(page)) page=1; //페이지가 false라면 page=1
 			vals.title = "회원 리스트 - 관리자";
 			(async () => {
-				sql ="SELECT * FROM member ORDER BY id DESC"; //id내림차순 정렬
+				sql = "SELECT count(id) FROM member";// member로 부터 count(id)를 찾아서 
 				result = await sqlExec(sql);
+				totCnt = result[0][0]["count(id)"];
+				const pagerVal = pager.pagerMaker({totCnt,page,grpCnt}); 
+				pagerVal.link="/mem/list/";
+				sql ="SELECT * FROM member ORDER BY id DESC limit ?, ?"; //id내림차순 정렬
+				result = await sqlExec(sql, [pagerVal.stRec, pagerVal.grpCnt]);
 				vals.lists = result[0];
+				vals.pager = pagerVal;
 				if(util.adminChk(req.session.user)) res.render("mem_list", vals);//pug전달
 				else res.send(util.alertAdmin());
 			})();

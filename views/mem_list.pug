@@ -28,7 +28,7 @@ html(lang="ko")
 				tbody
 					each item in lists
 						tr
-							td= item.id
+							td.text-center= item.id
 							td= item.usergrade
 							td= item.userid
 							td= item.username
@@ -40,5 +40,6 @@ html(lang="ko")
 							td
 								button.btn.btn-sm.btn-success 수정
 								button.btn.btn-sm.btn-danger 삭제
+			include ./inc/pager.pug
 		include ./inc/footer.pug
 		include ./inc/script.pug

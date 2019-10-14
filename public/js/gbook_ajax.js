@@ -69,7 +69,8 @@ function getPage(page) {
 		}
 		//pagerMaker($pager. grpcnt, totCnt, page) ->java객체로도 바꿔볼 것.
 		pagerMaker($(".pager"), grpCnt, divCnt, totCnt, page, function () {
-			if(!$(this).hasClass("disabled")) getPage($(this).data("page"));
+			if(!$(this).hasClass("disabled")) getPage($(this).data("page")); 
+			//util.js에서 $(".page-item").click(cb);에 받음.
 		});
 	});
 }
