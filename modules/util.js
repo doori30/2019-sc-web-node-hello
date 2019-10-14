@@ -1,8 +1,9 @@
-const zp = (n) => {
+//module.exports={};
+module.exports.zp = (n) => {
 	n < 10 ? n = "0" + n : n = n;
 	return n;
 }
-const dspDate = (d, type) => {
+module.exports.dspDate = (d, type) => {
 	var type = typeof type !== 'undefined' ? type : 0;
 	//type변수 =type의 형태를 찾는 typeof == '빈값' 같지 않으면 false =0 type값이 있으면 변수에 넣음.
 	// 기본 (parameter)값을 지정해 줄 수 있다.
@@ -46,13 +47,13 @@ const dspDate = (d, type) => {
 			break;
 		default:
 			//2019-09-03 14:08:09
-			returnStr = d.getFullYear() + '-' + zp(d.getMonth() + 1) + '-' + zp(d.getDate()) + ' ' + zp(d.getHours()) + ":" + zp(d.getMinutes()) + ':' + zp(d.getSeconds());
+			returnStr = d.getFullYear() + '-' + module.exports.zp(d.getMonth() + 1) + '-' + module.exports.zp(d.getDate()) + ' ' + module.exports.zp(d.getHours()) + ":" + module.exports.zp(d.getMinutes()) + ':' + module.exports.zp(d.getSeconds());
 			break;
 	}
 	return returnStr;
 }
 
-const alertLocation = (obj) => {
+module.exports.alertLocation = (obj) => {
 	var html = '<meta charser="utf-8">';
 	html += '<script>';
 	html += 'alert("' + obj.msg + '");';
@@ -61,16 +62,25 @@ const alertLocation = (obj) => {
 	return html;
 }
 
-const nullChk = (val) => {
+module.exports.alertAdmin = () => {
+	var html = '<meta charser="utf-8">';
+	html += '<script>';
+	html += 'alert("정상적인 접근이 아닙니다.");';
+	html += 'location.href="/";';
+	html += '</script>';
+	return html;
+}
+
+module.exports.nullChk = (val) => {
 	if (val !== undefined && val !== null && val !== "") return true;
 	else return false;
 }
 
-const iconChk = (dt, file) => {//사용자가 파일을 안던지면 null이됨(es6)
+module.exports.iconChk = (dt, file) => {//사용자가 파일을 안던지면 null이됨(es6)
 //const iconChk = (dt, file=null) => {//사용자가 파일을 안던지면 null이됨(es6)
 	//file = file?file:null ▲
 	const obj = {};
-	if (nullChk(file)) obj[file.split(".").pop()] = true; //확장자
+	if (module.exports.nullChk(file)) obj[file.split(".").pop()] = true; //확장자
 		var tsFile = new Date(dt).getTime();
 		var tsNow = new Date().getTime()-(24 * 60 * 60 * 1000); //24시간 60분 초 1000/초(현재시간-24시)자바-밀리초스탬프
 																														//24시간을 기준으로 24시간 전이면 NEW가 뜸.
@@ -90,13 +100,25 @@ const iconChk = (dt, file) => {//사용자가 파일을 안던지면 null이됨(
 // 	return obj;//파일일 없으면 빈객체로 진행
 // }//단점: 신규로 글을 등록시 파일이 없으면 NEW가 뜨지 않음.타임스탬프를 못가져옴.
 
-const telNum =["010","011","016","017","018","019","02","031","032","033","041","042","051","052","053","054","055","061","062","063","064"];
+module.exports.telNum =["010","011","016","017","018","019","02","031","032","033","041","042","051","052","053","054","055","061","062","063","064"];
 
-module.exports = {
-	dspDate,
-	alertLocation,
-	zp,
-	nullChk,
-	iconChk,
-	telNum
+module.exports.adminChk = (obj) =>{
+	if(module.exports.nullChk(obj)){
+		if(obj.grade == 9)	return true;
+			else return false;
+	}
+		else {
+		return false;
+	}
 }
+
+// module.exports = {
+// 	dspDate,
+// 	alertLocation,
+// 	alertAdmin,
+// 	zp,
+// 	nullChk,
+// 	iconChk,
+// 	telNum,
+// 	adminChk
+// }

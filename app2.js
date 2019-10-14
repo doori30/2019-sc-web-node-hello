@@ -24,9 +24,9 @@ const crypto = require("crypto"); //보안(암호)
 const sqlPool = db.sqlPool;
 const sqlExec = db.sqlExec;
 const sqlErr = db.sqlErr;
-const mysql = db.mysql;
+const mysql = db.mysql;``
 const salt = "My Password Key"//비밀번호 보안을 위해 양념을 침.
-var loginId;
+var loginUser = {id:"null"};
 
 //app초기화
 app.use("/", express.static("./public"));
@@ -56,7 +56,7 @@ app.get(["/page", "/page/:page"], (req, res) => {
 		title,
 		css,
 		js,
-		loginId
+		loginUser //null, undefined, 0, false
 	};
 	res.render("page", vals); //page.pug파일에 vals({page, title, css, js})라는 변수를 담아서 보냄.
 });
@@ -69,8 +69,9 @@ type: /up/1(id) - 선택된 방명록 수정
 type: /rm/1(id) - 선택된 방명록 삭제
 */
 app.get(["/gbook", "/gbook/:type", "/gbook/:type/:id"], (req, res) => {
-	loginId = req.session.userid;
+//loginUser = req.session.user;//유저정보를 세션의 유저 객체로 담음.
 	//로그인시 저장된 유저 아이디 , 로그인을 하지 않을 경우 undefiend가 저장됨. login(o): userid, login(x):undefiend
+	//req,session.user = {id: userid, name: username, grade: grade}
 	var type = req.params.type;
 	var id = req.params.id;
 	if (type === undefined) type = "li"
@@ -84,7 +85,7 @@ app.get(["/gbook", "/gbook/:type", "/gbook/:type/:id"], (req, res) => {
 	var vals = {
 		css: "gbook",
 		js: "gbook",
-		loginId
+		loginUser:req.session.user
 	}
 	switch (type) {
 		case "in":
@@ -281,7 +282,7 @@ app.get("/download", (req, res) => {
 //방명록을 Ajax 통신으로 데이터만 보내주는 방식
 //디자인준비.
 app.get("/gbook_ajax", (req, res) => {
-	loginId = req.session.userid;
+	loginUser = req.session.user;
 	const title = "방명록-Ajax";
 	const css = "gbook_ajax"
 	const js = "gbook_ajax"
@@ -289,7 +290,7 @@ app.get("/gbook_ajax", (req, res) => {
 		title,
 		css,
 		js,
-		loginId
+		loginUser
 	};
 	res.render("gbook_ajax", vals); //pug
 });
@@ -395,9 +396,10 @@ app.post("/mem/login", memLogin); //회원 로그인 모듈
 /* 함수구현 - GET */
 //const memEdit = (req,res) => {//실행과 동시에 위에app.get을 실행하는데 함수표현식이여서 찾을수 없음.->함수 선언문으로 바꿔서 쓸 것.
 function memEdit(req,res){
-	loginId = req.session.userid;
+	//loginUser = req.session.user; //대입
 	const type = req.params.type;
-	const vals = {css:"mem", js:"mem", loginId}; //pug전달.
+	//const vals = {css:"mem", js:"mem", loginUser}; //pug전달.
+	const vals = {css:"mem", js:"mem", loginUser:req.session.user}; //pug전달.
 
 	switch(type) {
 		case "join":
@@ -413,6 +415,19 @@ function memEdit(req,res){
 			req.session.destroy();
 			res.redirect("/");
 			break;
+		case "list":
+			vals.title = "회원 리스트 - 관리자";
+			(async () => {
+				sql ="SELECT * FROM member ORDER BY id DESC"; //id내림차순 정렬
+				result = await sqlExec(sql);
+				vals.lists = result[0];
+				if(util.adminChk(req.session.user)) res.render("mem_list", vals);//pug전달
+				else res.send(util.alertAdmin());
+			})();
+			break;
+
+		default:
+				break;
 	}
 }
 
@@ -475,12 +490,29 @@ function memLogin(req,res){
 	var vals = [];
 	userpw = crypto.createHash("sha512").update(userpw + salt).digest("base64"); //고정이된단다....옴[...]
 	(async () => {
-		sql = "SELECT count(id) FROM member WHERE userid=? AND userpw=?" //아이디와 패스워드가 일치하는 카운트 아이디를 찾을 것.
+		sql = "SELECT * FROM member WHERE userid=? AND userpw=?" 
+		/* 	sql = "SELECT count(id) FROM member WHERE userid=? AND userpw=?" 
+			//* 모든정보를 가져올 것.
+			//아이디와 패스워드가 일치하는 카운트 아이디를 찾을 것.* 모든정보를 가져올 것.
+			vals.push(userid);
+			vals.push(userpw);
+			result = await sqlExec(sql, vals); //->데이터 베이스를 던짐.
+			console.log(result);
+			if(result[0][0]["count(id)"] == 1) {//일치여부 확인 ->맞으면 sql이 돌아감.
+			//sql = "SELECT username, grade FROM member WHERE userid=? AND userpw=?; //찾은 아이디에 이름과 그리드정보 를 가겨옴.
+			//result = await sqlExec(sql, vals); ▲ 둘 다 사용가능 ▼
+				sql = "SELECT username, grade FROM member WHERE userid='"+userid+"'"; //찾은 아이디에 이름과 그리드정보 를 가져옴.
+				result = await sqlExec(sql);
+				//req.session.userid = userid; */
 		vals.push(userid);
 		vals.push(userpw);
-		result = await sqlExec(sql, vals);
-		if(result[0][0]["count(id)"] == 1) {
-			req.session.userid = userid;
+		result = await sqlExec(sql, vals); //->데이터 베이스를 던짐.
+		console.log(result);
+		if(result[0].length == 1) {//일치여부 확인 ->맞으면 sql이 돌아감.
+			req.session.user = {};
+			req.session.user.id = userid;
+			req.session.user.name = result[0][0].username;
+			req.session.user.grade = result[0][0].grade;
 			res.redirect("/");
 		}
 		else{

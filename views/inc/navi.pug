@@ -1,3 +1,4 @@
+link(rel="stylesheet" href="/css/navi.css")
 .navi.d-flex.justify-content-between.align-items-center.p-3.bg-dark.text-white.font-weight-bold#header
 	.logo 
 		a(href="/") HELLO Company
@@ -8,12 +9,26 @@
 			a(href="/gbook_ajax") 방명록(Ajax)
 		li.mr-3
 			a(href="/gbook/in") 방명록 작성
-		-if (loginId) {
-			li.mr-3
-				a(href="/mem/logout") 로그아웃
+		-if (loginUser) {
+			li.mr-3.position-relative
+				a(href="#")
+					i.fas.fa-user-circle.mr-2
+					span= loginUser.name
+				ul.mem-edit
+					li
+						a(href="/mem/edit") 정보수정
+					li
+						a(href="/mem/logout") 로그아웃
 		-} else {
 			li.mr-3
 				a(href="/mem/join") 회원가입
 			li.mr-3
 				a(href="/mem/login") 로그인
 		-}
+		-if(loginUser) {
+			-if(loginUser.grade == 9){
+				li.mr-3
+					a(href="/mem/list") 회원리스트
+			-}
+		-}
+script(src="/js/navi.js")

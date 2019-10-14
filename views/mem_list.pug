@@ -1,0 +1,44 @@
+doctype html
+html(lang="ko")
+	head
+		include ./inc/header.pug
+	body
+		include ./inc/navi.pug
+		.container.my-3
+			.jumbotron
+				h2= `${title}`
+			table.table.table-bordered
+				colgroup
+					col(width="5%")
+					col(width="8%")
+					col(width="13%")
+					col(width="13%")
+					col(width="15%")
+					col
+					col(width="12%")
+				thead.thead-dark
+					tr
+						th NO.
+						th 등급
+						th 아이디
+						th 이름
+						th 전화번호
+						th 주소
+						th 관리
+				tbody
+					each item in lists
+						tr
+							td= item.id
+							td= item.usergrade
+							td= item.userid
+							td= item.username
+							td= item.tel
+							td.text-left
+								span= `[${item.post}]`
+								br
+								apsn= `${item.addr1} ${item.addr2}`
+							td
+								button.btn.btn-sm.btn-success 수정
+								button.btn.btn-sm.btn-danger 삭제
+		include ./inc/footer.pug
+		include ./inc/script.pug
