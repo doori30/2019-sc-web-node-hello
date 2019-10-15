@@ -349,23 +349,30 @@ app.get("/gbook_ajax/:page", (req, res) => {
 // 	});
 // });
 
-//router 영역-POST
+//router 영역-POST(저장하는 곳)
 app.post("/gbook_save", mt.upload.single("upfile"), (req, res) => {
 	//                                                req.fileValidateError = "Y"; 
-	const writer = req.body.writer;
-	const pw = req.body.pw;
-	const comment = req.body.comment;
-	var orifile; //실제파일
-	var savefile; //저장된 파일->multer에서 받음
+	var writer = req.body.writer;
+	var comment = req.body.comment;
+	//const pw = req.body.pw;
+	var pw = "";
+	var userid = "";
+	if(req.session.user) userid = req.session.user.id;
+	else req.body.pw;
+	// var orifile; //실제파일
+	// var savefile; //저장된 파일->multer에서 받음
+	//         ▼
+	var orifile=""; //실제파일 빈파일이 있을 수 있기 때문에 빈값을 넣어주어야 한다.,
+	var savefile=""; //저장된 파일->multer에서 받음
 	if (req.file) { //업로드가 안되면  undefined로 빈문서가 들어감.,화면에 글은 작성되지만 파일이 올라가지 않는다.
 		orifile = req.file.originalname;
 		savefile = req.file.filename;
 	}
 	var result;
 
-	const sql = "INSERT INTO gbook SET comment=?, wtime=?, writer=?,pw=?, orifile=?, savefile=?";
+	const sql = "INSERT INTO gbook SET comment=?, wtime=?, writer=?,pw=?, orifile=?, savefile=?, userid=?";
 	//? 안에 들어갈 내용을 const data = await connect.query(sql, vals); 에서 받아서 실행해줌.
-	const vals = [comment, util.dspDate(new Date()), writer, pw, orifile, savefile];
+	var vals = [comment, util.dspDate(new Date()), writer, pw, orifile, savefile, userid];
 	(async () => {
 		result = await sqlExec(sql, vals);
 		//if(result[0].affectedRows > 0)res.redirect("gbook");
@@ -391,10 +398,11 @@ app.post("/gbook_save", mt.upload.single("upfile"), (req, res) => {
 
 /* 회원가입 및 로그인 등 */
 /* 회원 라우터 */
-app.get(["/mem/:type","/mem/:type/:id"],memEdit);// 회원가입, 아이디/비밀번호 찾기, 리스트, 정보, 로그인, 로그아웃
+app.get(["/mem/:type","/mem/:type/:id"],memEdit);// 회원가입, 아이디/비밀번호 찾기, 리스트, 정보, 로그인, 로그아웃,삭제
 app.post("/api-mem/:type", memApi); //회원가입시 각종Ajax
 app.post("/mem/join", memJoin); //회원가입 저장
 app.post("/mem/login", memLogin); //회원 로그인 모듈
+app.post("/mem/update", memUpdate); //회원정보 수정
 
 
 /* 함수구현 - GET */
@@ -418,6 +426,37 @@ function memEdit(req,res){
 		case "logout":
 			req.session.destroy();
 			res.redirect("/");
+			break;
+		case "edit":
+			(async ()=>{
+				sql = "SELECT * FROM member WHERE userid='"+req.session.user.id+"'";
+				result = await sqlExec(sql);
+				//res.json(result[0][0]);
+				vals.title = "회원정보 수정";
+				vals.myData = result[0][0];
+				vals.tel = util.telNum;
+				//res.json(vals);
+				res.render("mem_up", vals);//pug 에 vals변수를 전달함.(vals는 회원의 정보)
+			})();
+			break;
+		case "remove":
+			if(util.adminChk(req.session.user)){
+			var id = req.query.id;
+			//query ? / params /: body post정보
+			(async () => {
+				sql = "DELETE FROM member WHERE id="+id;
+				result = await sqlExec(sql);
+				if(result[0].affectedRows == 1) res.send(util.alertLocation({
+					msg:"삭제되었습니다.",
+					loc:"/mem/list"
+				}))
+				else res.send(util.alertLocation({
+					msg: "삭제가 실패하였습니다.",
+					loc: "/mem/list"
+				}))
+			})();
+		}
+		else res.send("/500.html");
 			break;
 		case "list":
 			var totCnt = 0;
@@ -480,7 +519,7 @@ function memJoin(req, res) {
 	vals.push(req.body.username);
 	vals.push(req.body.tel1 + "-" + req.body.tel2 + "-" + req.body.tel3);
 	vals.push(req.body.post);
-	vals.push(req.body.addr1 + req.body.addr2);
+	vals.push(req.body.addr1 +" "+ req.body.addr2);
 	vals.push(req.body.addr3);
 	vals.push(new Date());
 	vals.push(2);
@@ -492,6 +531,30 @@ function memJoin(req, res) {
 		res.send(util.alertLocation({
 			msg: "회원으로 가입되었습니다.",
 			loc: "/mem/login"
+		}));
+	})();
+}
+
+//회원정보 수정
+function memUpdate(req, res) {
+	const vals = [];
+	var userpw = crypto.createHash("sha512").update(req.body.userpw + salt).digest("base64");
+	vals.push(userpw);
+	vals.push(req.body.username);
+	vals.push(req.body.tel1 + "-" + req.body.tel2 + "-" + req.body.tel3);
+	vals.push(req.body.post);
+	vals.push(req.body.addr1 + " " + req.body.addr2);
+	vals.push(req.body.addr3);
+	vals.push(req.session.user.id);
+	var sql = "";
+	var result = {};
+	(async () => {
+		sql = "UPDATE member SET userpw=?, username=?, tel=?, post=?, addr1=?, addr2=? WHERE userid=?";
+		result = await sqlExec(sql, vals);
+	//	res.json(result[0]);
+		if(result[0].affectedRows == 1) res.send(util.alertLocation({
+			msg: "정보가 수정되었습니다.",
+			loc: "/"
 		}));
 	})();
 }

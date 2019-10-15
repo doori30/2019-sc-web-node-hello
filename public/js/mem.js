@@ -84,4 +84,6 @@ function memberLogin(f){
 	return true;
 }
 
+// 회원삭제
+
 
