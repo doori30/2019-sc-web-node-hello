@@ -114,14 +114,49 @@ function writeAjax(res, modal) {
 }
 //          td 부모한테 그중 0번째 아이의 글을 찾아서 변수id에 담음
 
-//삭제기능
+// //삭제기능
+// $(".btRev").click(function () {
+// 	var id = $(this).parent().parent().children("td").eq(0).text();
+// 	//버튼으로 부터 찾아감.
+// 	$("form[name='removeForm']").find("input[name='id']");
+// 	$("#remove-modal").find("input[name='id']").val(id);
+// 	$("#remove-modal").find("input[name='pw']").val('');
+// 	$("#remove-modal").modal("show");
+// });
+// $("#remove-modal").on("shown.bs.modal", function () {
+// 	$("#remove-modal").find("input[name='pw']").focus();
+// });
+//삭제기능-비회원
 $(".btRev").click(function () {
 	var id = $(this).parent().parent().children("td").eq(0).text();
 	//버튼으로 부터 찾아감.
-	$("form[name='removeForm']").find("input[name='id']");
+	//$("form[name='removeForm']").find("input[name='id']");
 	$("#remove-modal").find("input[name='id']").val(id);
 	$("#remove-modal").find("input[name='pw']").val('');
 	$("#remove-modal").modal("show");
+});
+$("#remove-modal").on("shown.bs.modal", function () {
+	$("#remove-modal").find("input[name='pw']").focus();
+});
+
+//삭제기능-회원,관리자
+$(".btRev2").click(function () {
+	var id = $(this).parent().parent().children("td").eq(0).text(); //글 id
+	//버튼으로 부터 찾아감.
+	var page = $(this).data("page");//gbook.pug에 있는 btRev2를 받음.
+	if(confirm("정말로 삭제하시겠습니까?")) {
+		//삭제시 Ajax방식으로 
+		ajax("/api/remove", "post", {id: id}, function(res){//node값을 res로 받아서
+			if(res.code == 200) {
+				alert("삭제되었습니다.");
+				// location.href = "/";
+				location.href = "/gbook/li/"+page; //전달받은 페이지로 이동(페이지가 픽스되어서 이동됨.)
+			 }
+			 else{
+					alert("삭제에 실패했습니다.");
+			 }
+		});
+	}
 });
 $("#remove-modal").on("shown.bs.modal", function () {
 	$("#remove-modal").find("input[name='pw']").focus();
