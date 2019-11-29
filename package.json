@@ -4,7 +4,8 @@
   "description": "1. 작업할 폴더를 만들고 \t`vscode`에서 생성한 폴더를 선택하고 `npm프로젝트`를 시작한다.\r ```\r npm init -y\r ```",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "pm2 start index.js",
+    "stop": "pm2 stop index.js"
   },
   "keywords": [],
   "author": "",
